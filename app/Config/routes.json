@@ -1,0 +1,51 @@
+{
+  "common": {
+    "before": [
+      "\\App\\Middleware\\RequestIdBeforeMiddleware",
+      "\\App\\Middleware\\CorsBeforeMiddleware"
+    ],
+    "after": [
+      "\\App\\Middleware\\RequestIdAfterMiddleware",
+      "\\App\\Middleware\\ResponseTimeAfterMiddleware",
+      "\\App\\Middleware\\ResponseLogAfterMiddleware"
+    ]
+  },
+  "groups": [
+    {
+      "name": "unversioned",
+      "notes": "",
+      "prefix": "",
+      "before": [],
+      "routes": [
+        { "methods":[], "path":"/health",   "handler":"\\App\\Controllers\\HealthController" },
+        { "methods":[], "path":"/status",   "handler":"\\App\\Controllers\\StatusController" }
+      ],
+      "after": []
+    },
+    {
+      "name":"Public",
+      "notes": "Public endpoints",
+      "prefix": "/blog/api/v1",
+      "before": [],
+      "routes": [
+        {  "methods":"POST", "path":"/register",  "handler":"\\App\\Controllers\\v1\\RegisterController" },
+        {  "methods":"POST", "path":"/signin",    "handler":"\\App\\Controllers\\v1\\SignInController" }
+      ],
+      "after": []
+    },
+    {
+      "name":"Authenticated",
+      "notes": "Authenticated endpoints",
+      "prefix": "/blog/api/v1",
+      "before": [],
+      "routes": [
+        {  "methods":"DELETE",  "path":"/signout",                    "handler":"\\App\\Controllers\\v1\\SignOutController" },
+        {  "methods":"",        "path":"/accounts[/{account}]",       "handler":"\\App\\Controllers\\v1\\AccountsController" },
+        {  "methods":"",        "path":"/blogs[/{blog}]",             "handler":"\\App\\Controllers\\v1\\BlogsController" },
+        {  "methods":"",        "path":"/articles[/{article}]",       "handler":"\\App\\Controllers\\v1\\ArticlesController" },
+        {  "methods":"",        "path":"/comments[/{comment}]",       "handler":"\\App\\Controllers\\v1\\commentsController" }
+      ],
+      "after": []
+    }
+  ]
+}

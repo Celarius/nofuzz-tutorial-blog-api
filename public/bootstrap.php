@@ -12,8 +12,8 @@
   # Composer related autoloads
   require_once __DIR__ . '/../vendor/autoload.php';
 
-  # Load and initialize the NoFuzz framework
-  require_once __DIR__ . '/../Nofuzz/Loader.php';
+  # Create Global Nofuzz $app Variable
+  $app = new \Nofuzz\Application( realpath(__DIR__.'/../') );
 
   # Load application globals (optional)
   if (file_exists(__DIR__ . '/../app/globals.php'))

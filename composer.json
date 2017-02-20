@@ -1,14 +1,13 @@
 {
-  "name": "nofuzz/nofuzz",
-  "description": "A PHP nano framework for REST API's",
+  "name": "nofuzz/tutorial-blog",
+  "description": "Nofuzz Tutorial Blog",
   "keywords": [
-    "Framework",
-    "REST",
-    "API",
-    "Micro Service"
+    "Nofuzz",
+    "Tutorial",
+    "Blog"
   ],
   "homepage": "http://nofuzz.celarius.com",
-  "type": "framework",
+  "type": "Application",
   "license": "MIT",
   "authors": [
     {
@@ -22,16 +21,11 @@
     "ext-mbstring": "*",
     "ext-Zend-OPCache": "*",
 
-    "nofuzz/framework": "*"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "^5.5"
+    "nofuzz/framework": "dev-master"
   },
   "autoload": {
     "psr-4": {
-      "Nofuzz\\": "nofuzz/",
       "App\\": "app/"
-    },
-    "classmap": []
+    }
   }
 }
