@@ -1,25 +1,25 @@
 <?php
 /**
- * blogs.php
+ * articles.php
  *
  * @package  Nofuzz Appliction
  */
 #########################################################################################
 
-namespace App\Db\Blogs;
+namespace App\Db;
 
 /**
- * Class representing rows in table 'blogs'
+ * Class representing rows in table 'articles'
  */
-class Blogs extends \Nofuzz\Database\BaseDbObject
+class Article extends \Nofuzz\Database\BaseDbObject
 {
   protected $id = '';                              // id BigInt(20) NOT NULL AUTO_INCREMENT
   protected $created_dt = null;                    // created_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
   protected $modified_dt = null;                   // modified_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   protected $uuid = '';                            // uuid NVarChar(64)
-  protected $account_id = '';                      // account_id BigInt(20) NOT NULL
+  protected $blog_id = '';                         // blog_id BigInt(20) NOT NULL
   protected $title = '';                           // title NVarChar(128) COLLATE utf8_general_ci
-  protected $description = '';                     // description Text CHARACTER SET utf8 COLLATE utf8_general_ci
+  protected $body = '';                            // body MediumText CHARACTER SET utf8 COLLATE utf8_general_ci
   protected $status = null;                        // status SmallInt(6) DEFAULT 0
 
   public function clear()
@@ -28,9 +28,9 @@ class Blogs extends \Nofuzz\Database\BaseDbObject
     $this->setCreatedDt(null);
     $this->setModifiedDt(null);
     $this->setUuid('');
-    $this->setAccountId('');
+    $this->setBlogId('');
     $this->setTitle('');
-    $this->setDescription('');
+    $this->setBody('');
     $this->setStatus(null);
 
     return $this;
@@ -42,9 +42,9 @@ class Blogs extends \Nofuzz\Database\BaseDbObject
     $result['created_dt'] = $this->getCreatedDt();
     $result['modified_dt'] = $this->getModifiedDt();
     $result['uuid'] = $this->getUuid();
-    $result['account_id'] = $this->getAccountId();
+    $result['blog_id'] = $this->getBlogId();
     $result['title'] = $this->getTitle();
-    $result['description'] = $this->getDescription();
+    $result['body'] = $this->getBody();
     $result['status'] = $this->getStatus();
 
     return $result;
@@ -56,9 +56,9 @@ class Blogs extends \Nofuzz\Database\BaseDbObject
     $this->setCreatedDt($a['created_dt'] ?? null);
     $this->setModifiedDt($a['modified_dt'] ?? null);
     $this->setUuid($a['uuid'] ?? '');
-    $this->setAccountId($a['account_id'] ?? '');
+    $this->setBlogId($a['blog_id'] ?? '');
     $this->setTitle($a['title'] ?? '');
-    $this->setDescription($a['description'] ?? '');
+    $this->setBody($a['body'] ?? '');
     $this->setStatus($a['status'] ?? null);
 
     return $this;
@@ -141,21 +141,21 @@ class Blogs extends \Nofuzz\Database\BaseDbObject
   }
 
   /**
-   * Get AccountId
+   * Get BlogId
    * @return
    */
-  public function getAccountId()
+  public function getBlogId()
   {
-    return $this->account_id;
+    return $this->blog_id;
   }
 
   /**
-   * Set AccountId
-   * @param    $account_id
+   * Set BlogId
+   * @param    $blog_id
    */
-  public function setAccountId($account_id)
+  public function setBlogId($blog_id)
   {
-    $this->account_id = $account_id;
+    $this->blog_id = $blog_id;
     return $this;
   }
 
@@ -179,21 +179,21 @@ class Blogs extends \Nofuzz\Database\BaseDbObject
   }
 
   /**
-   * Get Description
+   * Get Body
    * @return string
    */
-  public function getDescription()
+  public function getBody()
   {
-    return $this->description;
+    return $this->body;
   }
 
   /**
-   * Set Description
-   * @param   string $description
+   * Set Body
+   * @param   string $body
    */
-  public function setDescription($description)
+  public function setBody($body)
   {
-    $this->description = $description;
+    $this->body = $body;
     return $this;
   }
 
@@ -217,3 +217,4 @@ class Blogs extends \Nofuzz\Database\BaseDbObject
   }
 
 } // EOC
+

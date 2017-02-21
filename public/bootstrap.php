@@ -31,7 +31,7 @@
       }
     }
 
-  } catch (Exception $e) {
+  } catch (\Exception $e) {
     # Handle Any/All Exceptions
     logger()->critical( $e->getMessage(), ['trace'=>$e->getTraceAsString()] );
     // error_log( $e->getMessage().PHP_EOL.'trace='.$e->getTraceAsString() );

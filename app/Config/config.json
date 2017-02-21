@@ -8,9 +8,6 @@
             "message": "We are in maintenance mode, back shortly",
             "environment": "DEV",
             "timezone": "Europe\/Stockholm"
-        },
-        "responses": {
-            "compress": "false"
         }
     },
     "log": {
@@ -24,7 +21,7 @@
                 "line_datetime": "Y-m-d H:i:s.v e"
             },
             "php": {
-                "line_format": "[%channel%] [%level_name%] %message%",
+                "line_format": "[%channel%] [%level_name%] %message% %context%",
                 "line_datetime": "Y-m-d H:i:s.v e"
             }
         }
@@ -35,7 +32,7 @@
         }
     },
     "connections": {
-        "main": {
+        "blog_db_template": {
             "type": "Pdo",
             "driver": "mysql",
             "schema": "nf_blog",
@@ -43,6 +40,21 @@
             "port": 3306,
             "username": "root",
             "password": "****",
+            "charset": "UTF8",
+            "options": [
+                {"ATTR_PERSISTENT": true},
+                {"ATTR_ERRMODE": "ERRMODE_EXCEPTION"},
+                {"ATTR_AUTOCOMMIT": false}
+            ]
+        },
+        "blog_db": {
+            "type": "Pdo",
+            "driver": "mysql",
+            "schema": "nf_blog",
+            "host": "192.168.0.10",
+            "port": 3306,
+            "username": "admin",
+            "password": "admin",
             "charset": "UTF8",
             "options": [
                 {"ATTR_PERSISTENT": true},

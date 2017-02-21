@@ -1,45 +1,47 @@
 <?php
 /**
- * accounts.php
+ * blog_accounts.php
  *
  * @package  Nofuzz Appliction
  */
 #########################################################################################
 
-namespace App\Db\Accounts;
+namespace App\Db;
 
 /**
- * Class representing rows in table 'accounts'
+ * Class representing rows in table 'blog_accounts'
  */
-class Accounts extends \Nofuzz\Database\BaseDbObject
+class Account extends \Nofuzz\Database\BaseDbObject
 {
-  protected $id = null;                            // id BIGINT NOT NULL AUTO_INCREMENT
-  protected $created_dt = null;                    // created_dt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-  protected $modified_dt = null;                   // modified_dt TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  protected $id = '';                              // id BigInt(20) NOT NULL AUTO_INCREMENT
+  protected $created_dt = null;                    // created_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  protected $modified_dt = null;                   // modified_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   protected $uuid = '';                            // uuid NVarChar(32) COLLATE utf8_general_ci
   protected $login_name = '';                      // login_name NVarChar(32) COLLATE utf8_general_ci
   protected $first_name = '';                      // first_name NVarChar(32) COLLATE utf8_general_ci
   protected $last_name = '';                       // last_name NVarChar(32) COLLATE utf8_general_ci
+  protected $email = '';                           // email NVarChar(128)
   protected $jwt_secret = '';                      // jwt_secret NVarChar(64) COLLATE utf8_general_ci
   protected $pw_salt = '';                         // pw_salt NVarChar(128) COLLATE utf8_general_ci
   protected $pw_hash = '';                         // pw_hash NVarChar(128) COLLATE utf8_general_ci
-  protected $pw_iterations = null;                 // pw_iterations INT DEFAULT 1
-  protected $status = null;                        // status SMALLINT DEFAULT 0
+  protected $pw_iterations = 0;                    // pw_iterations Integer(11) DEFAULT 1
+  protected $status = 0;                           // status SmallInt(6) DEFAULT 0
 
   public function clear()
   {
-    $this->setId(null);
-    $this->setCreatedDt(null);
-    $this->setModifiedDt(null);
+    $this->setId('');
+    $this->setCreatedDt((new \DateTime('now',new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    $this->setModifiedDt((new \DateTime('now',new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
     $this->setUuid('');
     $this->setLoginName('');
     $this->setFirstName('');
     $this->setLastName('');
+    $this->setEmail('');
     $this->setJwtSecret('');
     $this->setPwSalt('');
     $this->setPwHash('');
-    $this->setPwIterations(null);
-    $this->setStatus(null);
+    $this->setPwIterations(0);
+    $this->setStatus(0);
 
     return $this;
   }
@@ -53,6 +55,7 @@ class Accounts extends \Nofuzz\Database\BaseDbObject
     $result['login_name'] = $this->getLoginName();
     $result['first_name'] = $this->getFirstName();
     $result['last_name'] = $this->getLastName();
+    $result['email'] = $this->getEmail();
     $result['jwt_secret'] = $this->getJwtSecret();
     $result['pw_salt'] = $this->getPwSalt();
     $result['pw_hash'] = $this->getPwHash();
@@ -64,25 +67,26 @@ class Accounts extends \Nofuzz\Database\BaseDbObject
 
   public function fromArray(array $a)
   {
-    $this->setId($a['id'] ?? null);
-    $this->setCreatedDt($a['created_dt'] ?? null);
-    $this->setModifiedDt($a['modified_dt'] ?? null);
+    $this->setId($a['id'] ?? '');
+    $this->setCreatedDt($a['created_dt'] ?? (new \DateTime('now',new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    $this->setModifiedDt($a['modified_dt'] ?? (new \DateTime('now',new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
     $this->setUuid($a['uuid'] ?? '');
     $this->setLoginName($a['login_name'] ?? '');
     $this->setFirstName($a['first_name'] ?? '');
     $this->setLastName($a['last_name'] ?? '');
+    $this->setEmail($a['email'] ?? '');
     $this->setJwtSecret($a['jwt_secret'] ?? '');
     $this->setPwSalt($a['pw_salt'] ?? '');
     $this->setPwHash($a['pw_hash'] ?? '');
-    $this->setPwIterations($a['pw_iterations'] ?? null);
-    $this->setStatus($a['status'] ?? null);
+    $this->setPwIterations($a['pw_iterations'] ?? 0);
+    $this->setStatus($a['status'] ?? 0);
 
     return $this;
   }
 
   /**
    * Get Id
-   * @return int
+   * @return
    */
   public function getId()
   {
@@ -91,7 +95,7 @@ class Accounts extends \Nofuzz\Database\BaseDbObject
 
   /**
    * Set Id
-   * @param   int $id
+   * @param    $id
    */
   public function setId($id)
   {
@@ -214,6 +218,25 @@ class Accounts extends \Nofuzz\Database\BaseDbObject
   }
 
   /**
+   * Get Email
+   * @return string
+   */
+  public function getEmail()
+  {
+    return $this->email;
+  }
+
+  /**
+   * Set Email
+   * @param   string $email
+   */
+  public function setEmail($email)
+  {
+    $this->email = $email;
+    return $this;
+  }
+
+  /**
    * Get JwtSecret
    * @return string
    */
@@ -272,7 +295,7 @@ class Accounts extends \Nofuzz\Database\BaseDbObject
 
   /**
    * Get PwIterations
-   * @return int
+   * @return
    */
   public function getPwIterations()
   {
@@ -281,7 +304,7 @@ class Accounts extends \Nofuzz\Database\BaseDbObject
 
   /**
    * Set PwIterations
-   * @param   int $pw_iterations
+   * @param    $pw_iterations
    */
   public function setPwIterations($pw_iterations)
   {

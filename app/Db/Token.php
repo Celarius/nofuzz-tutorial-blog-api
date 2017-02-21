@@ -6,12 +6,12 @@
  */
 #########################################################################################
 
-namespace App\Db\Tokens;
+namespace App\Db;
 
 /**
  * Class representing rows in table 'tokens'
  */
-class Tokens extends \Nofuzz\Database\BaseDbObject
+class Token extends \Nofuzz\Database\BaseDbObject
 {
   protected $id = null;                            // id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY
   protected $created_dt = null;                    // created_dt TIMESTAMP

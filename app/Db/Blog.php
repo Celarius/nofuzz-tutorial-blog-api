@@ -1,25 +1,25 @@
 <?php
 /**
- * comments.php
+ * blogs.php
  *
  * @package  Nofuzz Appliction
  */
 #########################################################################################
 
-namespace App\Db\Comments;
+namespace App\Db;
 
 /**
- * Class representing rows in table 'comments'
+ * Class representing rows in table 'blogs'
  */
-class Comments extends \Nofuzz\Database\BaseDbObject
+class Blog extends \Nofuzz\Database\BaseDbObject
 {
   protected $id = '';                              // id BigInt(20) NOT NULL AUTO_INCREMENT
   protected $created_dt = null;                    // created_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
   protected $modified_dt = null;                   // modified_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   protected $uuid = '';                            // uuid NVarChar(64)
-  protected $article_id = '';                      // article_id BigInt(20) NOT NULL
   protected $account_id = '';                      // account_id BigInt(20) NOT NULL
-  protected $comment = '';                         // `comment` Text CHARACTER SET utf8 COLLATE utf8_general_ci
+  protected $title = '';                           // title NVarChar(128) COLLATE utf8_general_ci
+  protected $description = '';                     // description Text CHARACTER SET utf8 COLLATE utf8_general_ci
   protected $status = null;                        // status SmallInt(6) DEFAULT 0
 
   public function clear()
@@ -28,9 +28,9 @@ class Comments extends \Nofuzz\Database\BaseDbObject
     $this->setCreatedDt(null);
     $this->setModifiedDt(null);
     $this->setUuid('');
-    $this->setArticleId('');
     $this->setAccountId('');
-    $this->setcomment('');
+    $this->setTitle('');
+    $this->setDescription('');
     $this->setStatus(null);
 
     return $this;
@@ -42,9 +42,9 @@ class Comments extends \Nofuzz\Database\BaseDbObject
     $result['created_dt'] = $this->getCreatedDt();
     $result['modified_dt'] = $this->getModifiedDt();
     $result['uuid'] = $this->getUuid();
-    $result['article_id'] = $this->getArticleId();
     $result['account_id'] = $this->getAccountId();
-    $result['comment'] = $this->getcomment();
+    $result['title'] = $this->getTitle();
+    $result['description'] = $this->getDescription();
     $result['status'] = $this->getStatus();
 
     return $result;
@@ -56,9 +56,9 @@ class Comments extends \Nofuzz\Database\BaseDbObject
     $this->setCreatedDt($a['created_dt'] ?? null);
     $this->setModifiedDt($a['modified_dt'] ?? null);
     $this->setUuid($a['uuid'] ?? '');
-    $this->setArticleId($a['article_id'] ?? '');
     $this->setAccountId($a['account_id'] ?? '');
-    $this->setcomment($a['comment'] ?? '');
+    $this->setTitle($a['title'] ?? '');
+    $this->setDescription($a['description'] ?? '');
     $this->setStatus($a['status'] ?? null);
 
     return $this;
@@ -141,25 +141,6 @@ class Comments extends \Nofuzz\Database\BaseDbObject
   }
 
   /**
-   * Get ArticleId
-   * @return
-   */
-  public function getArticleId()
-  {
-    return $this->article_id;
-  }
-
-  /**
-   * Set ArticleId
-   * @param    $article_id
-   */
-  public function setArticleId($article_id)
-  {
-    $this->article_id = $article_id;
-    return $this;
-  }
-
-  /**
    * Get AccountId
    * @return
    */
@@ -179,21 +160,40 @@ class Comments extends \Nofuzz\Database\BaseDbObject
   }
 
   /**
-   * Get comment
+   * Get Title
    * @return string
    */
-  public function getcomment()
+  public function getTitle()
   {
-    return $this->comment;
+    return $this->title;
   }
 
   /**
-   * Set comment
-   * @param   string $`comment`
+   * Set Title
+   * @param   string $title
    */
-  public function setcomment($comment)
+  public function setTitle($title)
   {
-    $this->comment = $comment;
+    $this->title = $title;
+    return $this;
+  }
+
+  /**
+   * Get Description
+   * @return string
+   */
+  public function getDescription()
+  {
+    return $this->description;
+  }
+
+  /**
+   * Set Description
+   * @param   string $description
+   */
+  public function setDescription($description)
+  {
+    $this->description = $description;
     return $this;
   }
 

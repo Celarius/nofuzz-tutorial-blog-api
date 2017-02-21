@@ -15,7 +15,7 @@ The API will __NOT__ cover the following:
 - EMail send/receive features
 
 
-# Authentication and Authorization
+## Authentication and Authorization
 The API checks the headers of incoming requests for `Basic Authentication`.
 
 Using the `Basic Authentication` is recommended only when a SSL connection is available to the REST API server.

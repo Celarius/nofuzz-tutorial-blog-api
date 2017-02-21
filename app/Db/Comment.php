@@ -1,25 +1,25 @@
 <?php
 /**
- * articles.php
+ * comments.php
  *
  * @package  Nofuzz Appliction
  */
 #########################################################################################
 
-namespace App\Db\Articles;
+namespace App\Db;
 
 /**
- * Class representing rows in table 'articles'
+ * Class representing rows in table 'comments'
  */
-class Articles extends \Nofuzz\Database\BaseDbObject
+class Comment extends \Nofuzz\Database\BaseDbObject
 {
   protected $id = '';                              // id BigInt(20) NOT NULL AUTO_INCREMENT
   protected $created_dt = null;                    // created_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
   protected $modified_dt = null;                   // modified_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
   protected $uuid = '';                            // uuid NVarChar(64)
-  protected $blog_id = '';                         // blog_id BigInt(20) NOT NULL
-  protected $title = '';                           // title NVarChar(128) COLLATE utf8_general_ci
-  protected $body = '';                            // body MediumText CHARACTER SET utf8 COLLATE utf8_general_ci
+  protected $article_id = '';                      // article_id BigInt(20) NOT NULL
+  protected $account_id = '';                      // account_id BigInt(20) NOT NULL
+  protected $comment = '';                         // `comment` Text CHARACTER SET utf8 COLLATE utf8_general_ci
   protected $status = null;                        // status SmallInt(6) DEFAULT 0
 
   public function clear()
@@ -28,9 +28,9 @@ class Articles extends \Nofuzz\Database\BaseDbObject
     $this->setCreatedDt(null);
     $this->setModifiedDt(null);
     $this->setUuid('');
-    $this->setBlogId('');
-    $this->setTitle('');
-    $this->setBody('');
+    $this->setArticleId('');
+    $this->setAccountId('');
+    $this->setcomment('');
     $this->setStatus(null);
 
     return $this;
@@ -42,9 +42,9 @@ class Articles extends \Nofuzz\Database\BaseDbObject
     $result['created_dt'] = $this->getCreatedDt();
     $result['modified_dt'] = $this->getModifiedDt();
     $result['uuid'] = $this->getUuid();
-    $result['blog_id'] = $this->getBlogId();
-    $result['title'] = $this->getTitle();
-    $result['body'] = $this->getBody();
+    $result['article_id'] = $this->getArticleId();
+    $result['account_id'] = $this->getAccountId();
+    $result['comment'] = $this->getcomment();
     $result['status'] = $this->getStatus();
 
     return $result;
@@ -56,9 +56,9 @@ class Articles extends \Nofuzz\Database\BaseDbObject
     $this->setCreatedDt($a['created_dt'] ?? null);
     $this->setModifiedDt($a['modified_dt'] ?? null);
     $this->setUuid($a['uuid'] ?? '');
-    $this->setBlogId($a['blog_id'] ?? '');
-    $this->setTitle($a['title'] ?? '');
-    $this->setBody($a['body'] ?? '');
+    $this->setArticleId($a['article_id'] ?? '');
+    $this->setAccountId($a['account_id'] ?? '');
+    $this->setcomment($a['comment'] ?? '');
     $this->setStatus($a['status'] ?? null);
 
     return $this;
@@ -141,59 +141,59 @@ class Articles extends \Nofuzz\Database\BaseDbObject
   }
 
   /**
-   * Get BlogId
+   * Get ArticleId
    * @return
    */
-  public function getBlogId()
+  public function getArticleId()
   {
-    return $this->blog_id;
+    return $this->article_id;
   }
 
   /**
-   * Set BlogId
-   * @param    $blog_id
+   * Set ArticleId
+   * @param    $article_id
    */
-  public function setBlogId($blog_id)
+  public function setArticleId($article_id)
   {
-    $this->blog_id = $blog_id;
+    $this->article_id = $article_id;
     return $this;
   }
 
   /**
-   * Get Title
-   * @return string
+   * Get AccountId
+   * @return
    */
-  public function getTitle()
+  public function getAccountId()
   {
-    return $this->title;
+    return $this->account_id;
   }
 
   /**
-   * Set Title
-   * @param   string $title
+   * Set AccountId
+   * @param    $account_id
    */
-  public function setTitle($title)
+  public function setAccountId($account_id)
   {
-    $this->title = $title;
+    $this->account_id = $account_id;
     return $this;
   }
 
   /**
-   * Get Body
+   * Get comment
    * @return string
    */
-  public function getBody()
+  public function getcomment()
   {
-    return $this->body;
+    return $this->comment;
   }
 
   /**
-   * Set Body
-   * @param   string $body
+   * Set comment
+   * @param   string $`comment`
    */
-  public function setBody($body)
+  public function setcomment($comment)
   {
-    $this->body = $body;
+    $this->comment = $comment;
     return $this;
   }
 
@@ -217,4 +217,3 @@ class Articles extends \Nofuzz\Database\BaseDbObject
   }
 
 } // EOC
-

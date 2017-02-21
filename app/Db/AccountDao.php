@@ -8,14 +8,6 @@
 
 namespace App\Db;
 
-interface AccountDao
-{
-  function fetchAll();
-  function fetchById(int $id);
-}
-
-################################################################################################################################
-
 class AccountDao extends \Nofuzz\Database\BaseDao
 {
   /**
@@ -37,10 +29,10 @@ class AccountDao extends \Nofuzz\Database\BaseDao
     $records = [];
     try {
       $localTrans = $this->beginTransaction();
-      $sql = 'SELECT * FROM accounts';
+      $sql = 'SELECT * blog_FROM accounts';
       if ($sth=$this->db()->prepare($sql) && $sth->execute()) {
         while ($row = $sth->fetch(\PDO::FETCH_ASSOC)) {
-          $records[] = new \App\Db\Session(array_change_key_case($row),CASE_LOWER);
+          $records[] = new \App\Db\Account(array_change_key_case($row),CASE_LOWER);
         }
         # Cache it
         if (cache())
@@ -52,7 +44,7 @@ class AccountDao extends \Nofuzz\Database\BaseDao
 
     } catch (Exception $e) {
       # Error Logging
-      logger()->critical('Exception',array('msg'=>$e->getMessage(),'trace'=>$e-getTraceAsString()));
+      logger()->critical($e->getMessage(),['rid'=>app('requestId'),'trace'=>$e-getTraceAsString()]);
 
       $this->rollback();
     }
@@ -67,15 +59,12 @@ class AccountDao extends \Nofuzz\Database\BaseDao
    * Cache result 'accounts:id:<id>'
    *
    * @param  int $id              The id
-   * @return array                The record
+   * @return null|object
    */
   public function fetchById(int $id)
   {
     $cacheKey = 'accounts:id:'.$id;
     $cacheTTL = 30; // seconds
-
-    # Default result
-    $record = [];
 
     # Check Cache for result
     if (cache()) {
@@ -83,10 +72,10 @@ class AccountDao extends \Nofuzz\Database\BaseDao
       if ($record) return $record;
     }
 
-    try
-    {
+    $record = null;
+    try {
       # Build SQL
-      $sql  = 'SELECT * FROM accounts WHERE id = :ID ';
+      $sql  = 'SELECT * FROM blog_accounts WHERE id = :ID ';
 
       $localTrans = $this->beginTransaction();
       if ($sth = $this->db()->prepare($sql))
@@ -107,7 +96,7 @@ class AccountDao extends \Nofuzz\Database\BaseDao
       if ($localTrans) $this->commit();
 
     } catch (Exception $e) {
-      logger()->critical('Exception',array('msg'=>$e->getMessage(),'trace'=>$e-getTraceAsString()));
+      logger()->critical($e->getMessage(),['rid'=>app('requestId'),'trace'=>$e-getTraceAsString()]);
 
       $this->rollback();
     }
@@ -121,15 +110,12 @@ class AccountDao extends \Nofuzz\Database\BaseDao
    * Cache result 'accounts:id:<id>', 'accounts:loginName:<name>'
    *
    * @param  string $loginName    The Login Name
-   * @return array                The record
+   * @return null|object
    */
   public function fetchByLoginName(string $loginName)
   {
     $cacheKey = 'accounts:loginName:'.$loginName;
     $cacheTTL = 30; // seconds
-
-    # Default result
-    $record = [];
 
     # Check Cache for result
     if (cache()) {
@@ -137,16 +123,15 @@ class AccountDao extends \Nofuzz\Database\BaseDao
       if ($record) return $record;
     }
 
-    try
-    {
-      # Build SQL
-      $sql  = 'SELECT * FROM accounts WHERE login_name = :LOGINNAME ';
+    $record = null;
+    try {
+      $sql  = 'SELECT * FROM blog_accounts WHERE login_name = :LOGIN_NAME ';
 
       $localTrans = $this->beginTransaction();
       if ($sth = $this->db()->prepare($sql))
       {
         # Bind params
-        $sth->bindValue(':LOGINNAME', $loginName, \PDO::PARAM_STR);
+        $sth->bindValue(':LOGIN_NAME', $loginName, \PDO::PARAM_STR);
         # Execute
         if (($sth->execute()) && ($row = $sth->fetch(\PDO::FETCH_ASSOC)))
         {
@@ -155,7 +140,7 @@ class AccountDao extends \Nofuzz\Database\BaseDao
           # Cache it
           if (cache()) {
             cache()->set($cacheKey, $record, $cacheTTL);
-            cache()->set('accounts:id:'.$record['id'], $record, $cacheTTL);
+            cache()->set('accounts:id:'.$record->getId(), $record, $cacheTTL);
           }
         }
         $sth->closeCursor();
@@ -163,7 +148,59 @@ class AccountDao extends \Nofuzz\Database\BaseDao
       if ($localTrans) $this->commit();
 
     } catch (Exception $e) {
-      logger()->critical('Exception',array('msg'=>$e->getMessage(),'trace'=>$e-getTraceAsString()));
+      logger()->critical($e->getMessage(),['rid'=>app('requestId'),'trace'=>$e-getTraceAsString()]);
+
+      $this->rollback();
+    }
+
+    return $record;
+  }
+
+  /**
+   * Get record by email_name
+   *
+   * Cache result 'accounts:email:<id>'
+   *
+   * @param  string $loginName    The Login Name
+   * @return null|object
+   */
+  public function fetchByEmail(string $email)
+  {
+    $cacheKey = 'accounts:email:'.$email;
+    $cacheTTL = 30; // seconds
+
+    # Check Cache for result
+    if (cache()) {
+      $record = cache()->get($cacheKey);
+      if ($record) return $record;
+    }
+
+    $record = null;
+    try {
+      $sql  = 'SELECT * FROM blog_accounts WHERE email = :EMAIL ';
+
+      $localTrans = $this->beginTransaction();
+      if ($sth = $this->db()->prepare($sql))
+      {
+        # Bind params
+        $sth->bindValue(':EMAIL', $email, \PDO::PARAM_STR);
+        # Execute
+        if (($sth->execute()) && ($row = $sth->fetch(\PDO::FETCH_ASSOC)))
+        {
+          # Get a row
+          $record = new \App\Db\Account(array_change_key_case($row),CASE_LOWER);
+          # Cache it
+          if (cache()) {
+            cache()->set($cacheKey, $record, $cacheTTL);
+            cache()->set('accounts:id:'.$record->getId(), $record, $cacheTTL);
+          }
+        }
+        $sth->closeCursor();
+      }
+      if ($localTrans) $this->commit();
+
+    } catch (Exception $e) {
+      logger()->critical($e->getMessage(),['rid'=>app('requestId'),'trace'=>$e-getTraceAsString()]);
 
       $this->rollback();
     }
@@ -172,152 +209,136 @@ class AccountDao extends \Nofuzz\Database\BaseDao
   }
 
 
-  // /**
-  //  * Checks if a $sessionid exists
-  //  *
-  //  * Checks only sessions that have NOT expired.
-  //  *
-  //  * @param  string  $sessionid       The sessionid to check. if empty the propety will be used.
-  //  * @return boolean                  True=Exists, False=Does NOT exist
-  //  */
-  // public function existsSession(string $sessionid=''): bool
-  // {
-  //   # Get the param, or the property
-  //   $sessionid = ( strlen($sessionid)==0 ? $this->sessionid : $sessionid );
+  /**
+   * Insert
+   *
+   * @param  \App\Db\Account $account [description]
+   * @return bool                     True=Success, False=Failed
+   */
+  public function insert(\App\Db\Account $account): bool
+  {
+    $cacheTTL = 30; // seconds
 
-  //   # No session, no result
-  //   if ( empty($sessionid) ) return false;
+    $result = false;
+    try {
+      $sql  = 'INSERT INTO blog_accounts '.
+              ' ( uuid, login_name, first_name, last_name, email, jwt_secret, pw_salt, pw_hash, pw_iterations, status) '.
+              'VALUES '.
+              ' (:UUID,:LOGIN_NAME,:FIRST_NAME,:LAST_NAME,:EMAIL,:JWT_SECRET,:PW_SALT,:PW_HASH,:PW_ITERATIONS,:STATUS)';
 
-  //   # Default result
-  //   $_sessionExists = false;
+      $localTrans = $this->beginTransaction();
+      if ($sth = $this->db()->prepare($sql))
+      {
+        # Bind params
+        $sth->bindValue(':UUID', $account->getUuid(),\PDO::PARAM_STR);
+        $sth->bindValue(':LOGIN_NAME', $account->getLoginName(),\PDO::PARAM_STR);
+        $sth->bindValue(':FIRST_NAME', $account->getFirstName(),\PDO::PARAM_STR);
+        $sth->bindValue(':LAST_NAME', $account->getLastName(),\PDO::PARAM_STR);
+        $sth->bindValue(':EMAIL', $account->getEmail(),\PDO::PARAM_STR);
+        $sth->bindValue(':JWT_SECRET', $account->getJwtSecret(),\PDO::PARAM_STR);
+        $sth->bindValue(':PW_SALT', $account->getPwSalt(),\PDO::PARAM_STR);
+        $sth->bindValue(':PW_HASH', $account->getPwHash(),\PDO::PARAM_STR);
+        $sth->bindValue(':PW_ITERATIONS', $account->getPwIterations(),\PDO::PARAM_STR);
+        $sth->bindValue(':STATUS', $account->getStatus(),\PDO::PARAM_STR);
+        # Execute
+        if ($sth->execute())
+        {
+          $account->setId( $this->db()->lastInsertId() );
+          # Cache it
+          if (cache()) {
+            cache()->set('accounts:id:'.$account->getId(), $account, $cacheTTL);
+          }
+        }
+        $sth->closeCursor();
+      }
+      if ($localTrans) {
+        error_log('committing');
+        $this->commit();
+      }
 
-  //   # Get a connection
-  //   $this->getDBConnection();
+      $result = true;
 
-  //   # Do the db stuff
-  //   if ($this->dbConnection)
-  //   try {
-  //     # Get Transaction status
-  //     $_isLocalTransaction = !$this->dbConnection->inTransaction();
+    } catch (Exception $e) {
+      logger()->critical($e->getMessage(),['rid'=>app('requestId'),'trace'=>$e-getTraceAsString()]);
 
-  //     # Start local transaction?
-  //     if ($_isLocalTransaction) $this->dbConnection->beginTransaction();
+      $this->rollback();
+    }
 
-  //     # Build SQL - Find session with $sessionid, that Expires in the future
-  //     $sql  = 'SELECT ';
-  //     $sql .= ' ID ';
-  //     $sql .= 'FROM ';
-  //     $sql .= ' WML_SESSIONS ';
-  //     $sql .= 'WHERE ';
-  //     $sql .= ' SESSIONID = :SID AND EXPIRES_DT >= :NOW';
-  //     # Prepare
-  //     if ($sth = $this->dbConnection->prepare($sql)) {
-  //       $sth->bindValue(':SID', $sessionid, \PDO::PARAM_STR);
-  //       $sth->bindValue(':NOW', $this->unixTimestampToStr($this->getUTCTimestampSec()), \PDO::PARAM_STR);
-  //       # Exec
-  //       if (($sth->execute()) && ($row = $sth->fetch(\PDO::FETCH_ASSOC))) {
-  //         # if ID exists, session exists
-  //         if ($row['ID']>0) $_sessionExists = true;
-  //       }
-  //       # Close cursor
-  //       if ($sth) $sth->closeCursor();
-  //     }
-  //     # Commit if local transaction
-  //     if ($_isLocalTransaction) $this->dbConnection->commit();
-
-  //   } catch (Exception $e) {
-  //     # Error Logging
-  //     $this->getLogger()->critical('Exception',array('msg'=>$e->getMessage(),'trace'=>$e-getTraceAsString()));
-
-  //     # Rollback if local transaction
-  //     if ($_isLocalTransaction) $this->dbConnection->rollback();
-  //   }
-
-  //   # Return results
-  //   return $_sessionExists;
-  // }
-
-
-
-  // /**
-  //  * Save Session properties to the storage
-  //  *
-  //  * @return bool                     True=Success, False=Failed
-  //  */
-  // public function saveToStorage(): bool
-  // {
-  //   # No session, no result
-  //   if ( empty($this->getSessionId()) ) return false;
-
-  //   # Default result
-  //   $_saveOk = false;
-
-  //   # Get a connection
-  //   $this->getDBConnection();
-
-  //   # Do the db stuff
-  //   if ($this->dbConnection)
-  //   try {
-  //     # Get Transaction status
-  //     $_isLocalTransaction = !$this->dbConnection->inTransaction();
-
-  //     # Start local transaction?
-  //     if ($_isLocalTransaction) $this->dbConnection->beginTransaction();
-
-  //     # Build SQL
-  //     $sql  = 'INSERT INTO WML_SESSIONS ';
-  //     $sql .= ' ( CREATED_DT, MODIFIED_DT, SESSIONID, EXTID, EXPIRES_DT, TYPEOF, SDATA, IP) ';
-  //     $sql .= 'VALUES ';
-  //     $sql .= ' (:CREATED_DT,:MODIFIED_DT,:SESSIONID,:EXTID,:EXPIRES_DT,:TYPEOF,:SDATA,:IP) ';
-  //     if ( strcasecmp($this->dbConnection->getDriverName(),'firebird')==0 ) {
-  //       $sql .= 'RETURNING ID';
-  //     }
-  //     # Prepare
-  //     if ($sth = $this->dbConnection->prepare($sql)) {
-  //       $sth->bindValue(':CREATED_DT', $this->getCreatedDt(), \PDO::PARAM_STR);
-  //       $sth->bindValue(':MODIFIED_DT', $this->getModifiedDt(), \PDO::PARAM_STR);
-  //       $sth->bindValue(':SESSIONID', $this->getSessionId(), \PDO::PARAM_STR);
-  //       $sth->bindValue(':EXTID', $this->getExtId(), \PDO::PARAM_STR);
-  //       $sth->bindValue(':EXPIRES_DT', $this->getExpiresDt(), \PDO::PARAM_STR);
-  //       $sth->bindValue(':TYPEOF', $this->getTypeOf(), \PDO::PARAM_STR);
-  //       $sth->bindValue(':SDATA', $this->getData(), \PDO::PARAM_STR);
-  //       $sth->bindValue(':IP', $this->getIp(), \PDO::PARAM_STR);
-  //       # Exec
-  //       if ($sth->execute()) {
-
-  //         if ( strcasecmp($this->dbConnection->getDriverName(),'firebird')==0 ) {
-  //           # Firebird (smarter) way of getting the ID
-  //           $route['ID'] = $row['ID'];
-  //         } else
-  //         if ( strcasecmp($this->dbConnection->getDriverName(),'mysql')==0 ) {
-  //           # MySQL way of getting the ID
-  //           $route['ID'] = $this->dbConnection->lastInsertId(); // MYSQL Specific
-  //         }
-  //         # Set OK
-  //         $_saveOk = true;
-  //       }
-  //       # Close cursor
-  //       if ($sth) $sth->closeCursor();
-  //     }
-  //     # Commit if local transaction
-  //     if ($_isLocalTransaction) $this->dbConnection->commit();
-
-  //   } catch (Exception $e) {
-  //     # Error Logging
-  //     $this->getLogger()->critical('Exception',array('msg'=>$e->getMessage(),'trace'=>$e-getTraceAsString()));
-
-  //     # Rollback if local transaction
-  //     if ($_isLocalTransaction) $this->dbConnection->rollback();
-  //   }
-
-  //   # Return results
-  //   return $_saveOk;
-  // }
+    return $result;
+  }
 
 
   /**
-   * Delete Session from storage based on the SessionId property
+   * Update
    *
+   * @param  \App\Db\Account $account [description]
+   * @return bool                     True=Success, False=Failed
+   */
+  public function update(\App\Db\Account $account): bool
+  {
+    $cacheTTL = 30; // seconds
+
+    $result = false;
+    try {
+      $sql  = 'UPDATE blog_accounts SET '.
+              ' uuid = :UUID, '.
+              ' login_name = :LOGIN_NAME, '.
+              ' first_name = :FIRST_NAME, '.
+              ' last_name = :LAST_NAME, '.
+              ' email = :EMAIL, '.
+              ' jwt_secret = :JWT_SECRET, '.
+              ' pw_salt = :PW_SALT, '.
+              ' pw_hash = :PW_HASH, '.
+              ' pw_iterations = :PW_ITERATIONS, '.
+              ' status = :STATUS '.
+              'WHERE '.
+              ' id = :ID';
+
+      $localTrans = $this->beginTransaction();
+      if ($sth = $this->db()->prepare($sql))
+      {
+        # Bind params
+        $sth->bindValue(':UUID', $account->getUuid(),\PDO::PARAM_STR);
+        $sth->bindValue(':LOGIN_NAME', $account->getLoginName(),\PDO::PARAM_STR);
+        $sth->bindValue(':FIRST_NAME', $account->getFirstName(),\PDO::PARAM_STR);
+        $sth->bindValue(':LAST_NAME', $account->getLastName(),\PDO::PARAM_STR);
+        $sth->bindValue(':EMAIL', $account->getEmail(),\PDO::PARAM_STR);
+        $sth->bindValue(':JWT_SECRET', $account->getJwtSecret(),\PDO::PARAM_STR);
+        $sth->bindValue(':PW_SALT', $account->getPwSalt(),\PDO::PARAM_STR);
+        $sth->bindValue(':PW_HASH', $account->getPwHash(),\PDO::PARAM_STR);
+        $sth->bindValue(':PW_ITERATIONS', $account->getPwIterations(),\PDO::PARAM_STR);
+        $sth->bindValue(':STATUS', $account->getStatus(),\PDO::PARAM_STR);
+        $sth->bindValue(':ID', $account->getId(),\PDO::PARAM_STR);
+
+        # Execute
+        if ($sth->execute())
+        {
+          $account->setId( $sth->getLastInsertId() );
+          # Cache it
+          if (cache()) {
+            cache()->set('accounts:id:'.$account->getId(), $account, $cacheTTL);
+          }
+        }
+        $sth->closeCursor();
+      }
+      if ($localTrans) $this->commit();
+
+      $result = true;
+
+    } catch (Exception $e) {
+      logger()->critical($e->getMessage(),['rid'=>app('requestId'),'trace'=>$e-getTraceAsString()]);
+
+      $this->rollback();
+    }
+
+    return $result;
+
+  }
+
+  /**
+   * Delete
+   *
+   * @param  \App\Db\Account $account [description]
    * @return bool                     True=Success, False=Failed
    */
   public function delete(\App\Db\Account $account): bool
@@ -332,7 +353,7 @@ class AccountDao extends \Nofuzz\Database\BaseDao
     try
     {
       # Build SQL
-      $sql  = 'DELETE FROM accounts WHERE id = :ID ';
+      $sql  = 'DELETE FROM blog_accounts WHERE id = :ID ';
 
       $localTrans = $this->beginTransaction();
       if ($sth = $this->db()->prepare($sql))
@@ -349,7 +370,7 @@ class AccountDao extends \Nofuzz\Database\BaseDao
       if ($localTrans) $this->commit();
 
     } catch (Exception $e) {
-      logger()->critical('Exception',array('msg'=>$e->getMessage(),'trace'=>$e-getTraceAsString()));
+      logger()->critical($e->getMessage(),['rid'=>app('requestId'),'trace'=>$e-getTraceAsString()]);
 
       $this->rollback();
     }
