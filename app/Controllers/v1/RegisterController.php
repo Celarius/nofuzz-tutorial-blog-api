@@ -15,7 +15,24 @@ Content-Type: application/json
   "password": "admin"
 }
 
- */
+Response is the fully filled structure:
+{
+  "id": null,
+  "created_dt": "",
+  "modified_dt": "",
+  "uuid": "string",
+  "login_name": "string",
+  "first_name": "string",
+  "last_name": "string",
+  "email": "string",
+  "jwt_secret": "string",
+  "pw_salt": "string",
+  "pw_hash": "string",
+  "pw_iterations": null,
+  "status": 0
+}
+
+*/
 namespace App\Controllers\v1;
 
 class RegisterController extends \Nofuzz\Controller
@@ -47,8 +64,8 @@ class RegisterController extends \Nofuzz\Controller
     # Create an account, prefill with values from array
     $account = new \App\Db\Account($params);
     $account->setUuid( \Nofuzz\Helpers\UUID::generate() );
-    $account->setPwSalt( \Nofuzz\Helpers\Hash::generate($account->getUuid()) );
-    $account->setPwHash( \Nofuzz\Helpers\Hash::generate($params['password']) );
+    $account->setPwSalt( \Nofuzz\Helpers\Hash::generate( $account->getUuid()) );
+    $account->setPwHash( \Nofuzz\Helpers\Hash::generate( $account->getUuid()).$params['password']) );
 
     # Insert into DB
     if ((new \App\Db\AccountDao('blog_db'))->insert($account)) {

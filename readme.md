@@ -26,7 +26,7 @@ Using the `Basic Authentication` is recommended only when a SSL connection is av
 After installing this tutorial to a new folder, you need to run composers update to download all dependencies.
 
 ```txt
-$ composer update -o
+$ composer update -o --no-dev
 ```
 
 
