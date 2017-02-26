@@ -65,6 +65,14 @@ class StatusController extends \Nofuzz\Controller
         $data['php']['modules']['Zend OPcache']=phpversion('Zend OPcache');
       if (extension_loaded('PDO'))
         $data['php']['modules']['PDO']=phpversion('PDO');
+      if (extension_loaded('PDO_Firebird'))
+        $data['php']['modules']['PDO_Firebird']=phpversion('PDO_Firebird');
+      if (extension_loaded('PDO_Mysql'))
+        $data['php']['modules']['PDO_Mysql']=phpversion('PDO_Mysql');
+      if (extension_loaded('PDO_Firebird'))
+        $data['php']['modules']['PDO_Firebird']=phpversion('PDO_Firebird');
+      if (extension_loaded('PDO_SqLite'))
+        $data['php']['modules']['PDO_SqLite']=phpversion('PDO_SqLite');
       # Zend Engine version
       $data['php']['zend.version']=zend_version();
     }

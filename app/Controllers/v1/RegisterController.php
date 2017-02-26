@@ -1,6 +1,21 @@
 <?php
 /**
- * status.php
+ * RegisterController.php
+ *
+ * Attempts to register a new account in the system.
+ * Verifies the parameters, and validates that there is no other account
+ * with the same signin credentials.
+ *
+ * If successful adds the account to the database, and returns the information
+ * for the account.
+ *
+ * Note:   This controller can be used to scrape for eamils/account names as it
+ *         returns explicit info on which field is incorrect. In production a
+ *         single message should be enough for both cases.
+ *
+ * Note2:  The registration endpoint should not be exposed to the public internet,
+ *         instead a UI should handle the request/response from this endpoint and
+ *         abstract the information.
  */
 #################################################################################################################################
 /*
@@ -15,7 +30,7 @@ Content-Type: application/json
   "password": "admin"
 }
 
-Response is the fully filled structure:
+Response is the structure:
 {
   "id": null,
   "created_dt": "",
@@ -31,7 +46,6 @@ Response is the fully filled structure:
   "pw_iterations": null,
   "status": 0
 }
-
 */
 namespace App\Controllers\v1;
 
@@ -64,8 +78,8 @@ class RegisterController extends \Nofuzz\Controller
     # Create an account, prefill with values from array
     $account = new \App\Db\Account($params);
     $account->setUuid( \Nofuzz\Helpers\UUID::generate() );
-    $account->setPwSalt( \Nofuzz\Helpers\Hash::generate( $account->getUuid()) );
-    $account->setPwHash( \Nofuzz\Helpers\Hash::generate( $account->getUuid()).$params['password']) );
+    $account->setPwSalt( \Nofuzz\Helpers\Hash::generate($account->getUuid()) );
+    $account->setPwHash( \Nofuzz\Helpers\Hash::generate($account->getUuid().$params['password']) );
 
     # Insert into DB
     if ((new \App\Db\AccountDao('blog_db'))->insert($account)) {
@@ -77,7 +91,7 @@ class RegisterController extends \Nofuzz\Controller
     } else {
       # Generate Response
       response()
-        ->setJsonError(501,'','Faile to register account, reason unknown' );
+        ->errorJson(501,'','Failed to register account, reason unknown' );
 
     }
 
@@ -126,15 +140,15 @@ class RegisterController extends \Nofuzz\Controller
    */
   protected function validateParams(array $params=[]):bool
   {
-    $dbAccount = (new \App\Db\AccountDao('blog_db'))->fetchByLoginName($params['login_name']);
+    $dbAccounts = (new \App\Db\AccountDao('blog_db'))->fetchByLoginName($params['login_name']);
 
-    if (!is_null($dbAccount)) {
+    if (count($dbAccounts)>0) {
       response()->errorJson(400,'','An account with {login} already exists');
       return false;
     }
 
-    $dbAccount = (new \App\Db\AccountDao('blog_db'))->fetchByEMail($params['email']);
-    if (!is_null($dbAccount)) {
+    $dbAccounts = (new \App\Db\AccountDao('blog_db'))->fetchByEMail($params['email']);
+    if (count($dbAccounts)>0) {
       response()->errorJson(400,'','An account with {email} already exists');
       return false;
     }

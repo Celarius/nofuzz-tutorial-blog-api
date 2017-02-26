@@ -8,7 +8,8 @@
             "message": "We are in maintenance mode, back shortly",
             "environment": "DEV",
             "timezone": "Europe\/Stockholm"
-        }
+        },
+        "secret": "7CD7BF37D923B6DBF5292C9FB6F9F68772A17022E8E2E3D41D5E6C94ECBA10E2"
     },
     "log": {
         "level": "error",
@@ -34,7 +35,7 @@
     "connections": {
         "blog_db_template": {
             "type": "Pdo",
-            "driver": "mysql",
+            "driver": "MySql",
             "schema": "nf_blog",
             "host": "127.0.0.1",
             "port": 3306,
@@ -61,6 +62,11 @@
                 {"ATTR_ERRMODE": "ERRMODE_EXCEPTION"},
                 {"ATTR_AUTOCOMMIT": false}
             ]
+        },
+        "blog_db_sqlite": {
+            "type": "Pdo",
+            "driver": "SqlLite",
+            "filename": "storage\\database\\blog_db.sqlite"
         }
     }
 }

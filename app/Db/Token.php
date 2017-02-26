@@ -8,10 +8,7 @@
 
 namespace App\Db;
 
-/**
- * Class representing rows in table 'tokens'
- */
-class Token extends \Nofuzz\Database\BaseDbObject
+class Token extends \App\Db\AbstractBaseDbObject
 {
   protected $id = null;                            // id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY
   protected $created_dt = null;                    // created_dt TIMESTAMP

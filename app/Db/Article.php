@@ -8,10 +8,7 @@
 
 namespace App\Db;
 
-/**
- * Class representing rows in table 'articles'
- */
-class Article extends \Nofuzz\Database\BaseDbObject
+class Article extends \App\Db\AbstractBaseDbObject
 {
   protected $id = '';                              // id BigInt(20) NOT NULL AUTO_INCREMENT
   protected $created_dt = null;                    // created_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
