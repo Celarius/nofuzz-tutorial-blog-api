@@ -1,5 +1,5 @@
 # Nofuzz Blog Tutorial
-This is a tutorial on how to make a REST API application using the Nofuzz framework. 
+This is a tutorial will show how to make a Blog system REST API using the Nofuzz framework.
 
 The result of this tutorial is a number of endpoints, complete with middleware, authentication and reading & writing to the databases. 
 
@@ -16,9 +16,9 @@ The API will __NOT__ cover the following:
 
 
 ## Authentication and Authorization
-The API checks the headers of incoming requests for `Basic Authentication`.
+Only the Registeration and SignIn endpoints have no authentication checks. The other API endpoints will use `JWT tokens` to authenticate the requests.
 
-Using the `Basic Authentication` is recommended only when a SSL connection is available to the REST API server.
+The JWT Token is obtained by calling the SignIn endpoint with correct credentials. Once obtained it needs to be passed to all other endpints via the `Authorization: Bearer <token>` header.
 
 
 ---
@@ -33,7 +33,7 @@ $ composer update -o --no-dev
 ---
 # Tutorial
 
-## Design the application - Steps
+*Design the application - Steps*
 The following steps were taken when designing this tutorial application:
 
 1. Define the API
@@ -46,7 +46,7 @@ The following steps were taken when designing this tutorial application:
 
 
 ## 1 - Define the API
-Here wea re going to define the API endpoints that will make up the whole API. The API endpoints are grouped into logical groups as per below:
+Here we're going to define the API endpoints that will make up the whole API. The API endpoints are grouped into logical groups as per below:
 
 *Register*
 ```txt
@@ -59,8 +59,7 @@ DELETE  /blog/api/v1/signout            Sign Out (remove session/token)
 ```
 *Accounts*
 ```txt
-GET     /blog/api/v1/accounts           Get list of Accounts
-GET     /blog/api/v1/accounts/{id}      Get an Account
+GET     /blog/api/v1/accounts[/{id}]    Get Account(s) 
 POST    /blog/api/v1/accounts           Create an Account
 PUT     /blog/api/v1/accounts           Update an Account
 DELETE  /blog/api/v1/accounts           Remove an account
