@@ -33,21 +33,6 @@
         }
     },
     "connections": {
-        "blog_db_template": {
-            "type": "Pdo",
-            "driver": "MySql",
-            "schema": "nf_blog",
-            "host": "127.0.0.1",
-            "port": 3306,
-            "username": "root",
-            "password": "****",
-            "charset": "UTF8",
-            "options": [
-                {"ATTR_PERSISTENT": true},
-                {"ATTR_ERRMODE": "ERRMODE_EXCEPTION"},
-                {"ATTR_AUTOCOMMIT": false}
-            ]
-        },
         "blog_db": {
             "type": "Pdo",
             "driver": "mysql",
@@ -55,7 +40,7 @@
             "host": "192.168.0.10",
             "port": 3306,
             "username": "admin",
-            "password": "admin",
+            "password": "*****",
             "charset": "UTF8",
             "options": [
                 {"ATTR_PERSISTENT": true},

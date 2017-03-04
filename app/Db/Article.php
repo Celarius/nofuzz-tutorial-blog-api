@@ -2,13 +2,13 @@
 /**
  * articles.php
  *
- * @package  Nofuzz Appliction
+ * @package     Nofuzz-blog-tutorial
  */
 #########################################################################################
 
 namespace App\Db;
 
-class Article extends \App\Db\AbstractBaseDbObject
+class Article extends \App\Db\AbstractBaseEntity
 {
   protected $id = '';                              // id BigInt(20) NOT NULL AUTO_INCREMENT
   protected $created_dt = null;                    // created_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP

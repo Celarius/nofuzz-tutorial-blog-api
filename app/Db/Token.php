@@ -2,13 +2,13 @@
 /**
  * tokens.php
  *
- * @package  Nofuzz Appliction
+ * @package     Nofuzz-blog-tutorial
  */
 #########################################################################################
 
 namespace App\Db;
 
-class Token extends \App\Db\AbstractBaseDbObject
+class Token extends \App\Db\AbstractBaseEntity
 {
   protected $id = null;                            // id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY
   protected $created_dt = null;                    // created_dt TIMESTAMP

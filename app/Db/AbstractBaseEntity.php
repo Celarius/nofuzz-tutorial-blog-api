@@ -2,12 +2,12 @@
 /**
  * Abstract Bae DB Object.php
  *
- * @package  Nofuzz Appliction
+ * @package     Nofuzz-blog-tutorial
  */
 #########################################################################################
 
 namespace App\Db;
 
-abstract class AbstractBaseDbObject extends \Nofuzz\Database\BaseDbObject
+abstract class AbstractBaseEntity extends \Nofuzz\Database\BaseDbObject
 {
 }

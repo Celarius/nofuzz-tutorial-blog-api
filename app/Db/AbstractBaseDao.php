@@ -2,7 +2,7 @@
 /**
  * AbstractBaseDao
  *
- * @package     [app]
+ * @package     Nofuzz-blog-tutorial
 */
 ################################################################################################################################
 
@@ -10,15 +10,15 @@ namespace App\Db;
 
 interface AbstractBaseDaoInterface
 {
-  function makeEntity(array $fields=[]): \App\Db\AbstractBaseDbObject;
+  function makeEntity(array $fields=[]): \App\Db\AbstractBaseEntity;
 
   function fetchCustom(string $sql,array $params=[]): array;
   function execCustom(string $sql, array $params=[]): bool;
   function execCustomGetLastId(string $sql, array $params=[]): int;
 
-  function insert(\App\Db\AbstractBaseDbObject $item): bool;
-  function update(\App\Db\AbstractBaseDbObject $item): bool;
-  function delete(\App\Db\AbstractBaseDbObject $item): bool;
+  function insert(\App\Db\AbstractBaseEntity $item): bool;
+  function update(\App\Db\AbstractBaseEntity $item): bool;
+  function delete(\App\Db\AbstractBaseEntity $item): bool;
 
   function getTable(): string;
   function setTable(string $table);
@@ -156,17 +156,22 @@ abstract class AbstractBaseDao extends \Nofuzz\Database\BaseDao implements Abstr
   }
 
   /**
-   * Delete
+   * Delete $item
    *
-   * @param  \App\Db\AbstractBaseDbObject   $item
+   * @param  \App\Db\AbstractBaseEntity   $item
    * @return bool
    */
-  public function delete(\App\Db\AbstractBaseDbObject $item): bool
+  public function delete(\App\Db\AbstractBaseEntity &$item): bool
   {
-    return $this->execCustom(
-              'DELETE FROM {table} WHERE id = :ID ',
-              [':ID' => $item->getId()]
-            );
+    $ok = $this->execCustom(
+            'DELETE FROM {table} WHERE id = :ID ',
+            [':ID' => $item->getId()]
+          );
+
+    if ($ok)
+      $item->setId(0);
+
+    return $ok;
   }
 
   /**

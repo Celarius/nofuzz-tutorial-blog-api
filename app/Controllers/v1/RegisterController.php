@@ -16,6 +16,8 @@
  * Note2:  The registration endpoint should not be exposed to the public internet,
  *         instead a UI should handle the request/response from this endpoint and
  *         abstract the information.
+ *
+ * @package     Nofuzz-blog-tutorial
  */
 #################################################################################################################################
 /*
@@ -51,10 +53,15 @@ namespace App\Controllers\v1;
 
 class RegisterController extends \Nofuzz\Controller
 {
-
+  /**
+   * Handle POST
+   *
+   * @param  array  $args [description]
+   * @return [type]       [description]
+   */
   public function handlePOST(array $args)
   {
-    # Validate Content-type
+    # Validate HTTP Request "Content-type"
     if (!preg_match('/application\/json/i',(request()->getHeader('Content-Type')[0] ?? ''))) {
       response()->errorJson(400,'','Invalid Content-Type: '.(request()->getHeader('Content-Type')[0] ?? '') );
 
@@ -62,8 +69,7 @@ class RegisterController extends \Nofuzz\Controller
     }
 
     # Decode payload
-    $json = request()->getBody()->getContents();
-    $params = (json_decode($json,true) ?? []);
+    $params = (json_decode(request()->getBody()->getContents(),true) ?? []);
 
     # Check input params are ok - stage 1
     if (!$this->checkParams($params)) {

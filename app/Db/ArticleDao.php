@@ -1,6 +1,6 @@
 <?php
 /**
- * AccountDao
+ * ArticleDao
  *
  * @package     Nofuzz-blog-tutorial
 */
@@ -8,7 +8,7 @@
 
 namespace App\Db;
 
-class AccountDao extends \App\Db\AbstractBaseDao
+class ArticleDao extends \App\Db\AbstractBaseDao
 {
   /**
    * Constructor
@@ -18,7 +18,7 @@ class AccountDao extends \App\Db\AbstractBaseDao
   public function __construct(string $connectionName)
   {
     parent::__construct($connectionName);
-    $this->setTable('blog_accounts');
+    $this->setTable('blog_articles');
   }
 
   /**
@@ -29,7 +29,7 @@ class AccountDao extends \App\Db\AbstractBaseDao
    */
   function makeEntity(array $fields=[]): \App\Db\AbstractBaseEntity
   {
-    return new \App\Db\Account(array_change_key_case($fields),CASE_LOWER);
+    return new \App\Db\Article(array_change_key_case($fields),CASE_LOWER);
   }
 
   /**
@@ -73,32 +73,50 @@ class AccountDao extends \App\Db\AbstractBaseDao
   }
 
   /**
-   * Get record by login_name
+   * Get record by title
    *
-   * @param  string $loginName    The Login Name
+   * @param  string $title          The title
    * @return array
    */
-  public function fetchByLoginName(string $loginName)
+  public function fetchByTitle(string $title)
   {
     return
       $this->fetchCustom(
-        'SELECT * FROM {table} WHERE login_name = :LOGIN_NAME',
-        [':LOGIN_NAME' => $loginName]
+        'SELECT * FROM {table} WHERE LOWER(title) = :TITLE',
+        [':TITLE' => strtolower($title)]
       );
   }
 
   /**
-   * Get record by email_name
+   * Get records by keywords
    *
-   * @param  string $loginName    The Login Name
+   * @param  array $keywords
    * @return array
    */
-  public function fetchByEmail(string $email)
+  public function fetchByKeywords(array $keywords=[])
   {
+    $where = '';
+    $binds = [];
+
+    if (!empty($keywords['title'])) {
+      $where .= 'AND (title LIKE :TITLE) ';
+      $binds[':TITLE'] = $title;
+    }
+
+    if (!empty($keywords['q'])) {
+      $where .= 'AND (title LIKE :Q1 OR body LIKE :Q2) ';
+      $binds[':Q1'] = $q;
+      $binds[':Q2'] = $q;
+    }
+
+    if (!empty($where)) {
+      $where = 'WHERE '.ltrim($where,'AND ');
+    }
+
     return
       $this->fetchCustom(
-        'SELECT * FROM {table} WHERE email = :EMAIL',
-        [':EMAIL' => $email]
+        'SELECT * FROM {table} '.$where,
+        $binds
       );
   }
 
