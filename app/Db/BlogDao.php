@@ -1,6 +1,6 @@
 <?php
 /**
- * ArticleDao
+ * BlogDao
  *
  * @package     Nofuzz-blog-tutorial
 */
@@ -8,7 +8,7 @@
 
 namespace App\Db;
 
-class ArticleDao extends \App\Db\AbstractBaseDao
+class BlogDao extends \App\Db\AbstractBaseDao
 {
   /**
    * Constructor
@@ -16,7 +16,7 @@ class ArticleDao extends \App\Db\AbstractBaseDao
   public function __construct(string $connectionName)
   {
     parent::__construct($connectionName);
-    $this->setTable('blog_articles');
+    $this->setTable('blog_blogs');
   }
 
   /**
@@ -27,7 +27,7 @@ class ArticleDao extends \App\Db\AbstractBaseDao
    */
   function makeEntity(array $fields=[]): \App\Db\AbstractBaseEntity
   {
-    return new \App\Db\Article(array_change_key_case($fields),CASE_LOWER);
+    return new \App\Db\Blog(array_change_key_case($fields),CASE_LOWER);
   }
 
   /**
@@ -103,7 +103,7 @@ class ArticleDao extends \App\Db\AbstractBaseDao
     }
 
     if (!empty($keywords['q'])) {
-      $where .= 'AND (title LIKE :Q1 OR body LIKE :Q2) ';
+      $where .= 'AND (title LIKE :Q1 OR description LIKE :Q2) ';
       $binds[':Q1'] = $keywords['q'];
       $binds[':Q2'] = $keywords['q'];
     }
@@ -137,16 +137,16 @@ class ArticleDao extends \App\Db\AbstractBaseDao
     $id =
       $this->execCustomGetLastId(
         'INSERT INTO {table} '.
-        ' ( created_dt, modified_dt, uuid, blog_id, title, body, status) '.
+        ' ( created_dt, modified_dt, uuid, article_id, title, description, status) '.
         'VALUES '.
-        ' (:CREATED_DT,:MODIFIED_DT,:UUID,:BLOG_ID,:TITLE,:BODY,:STATUS)',
+        ' (:CREATED_DT,:MODIFIED_DT,:UUID,:ARTICLE_ID,:TITLE,:DESCRIPTION,:STATUS)',
         [
           ':CREATED_DT' => $item->getCreatedDt(),
           ':MODIFIED_DT' => $item->getModifiedDt(),
           ':UUID' => $item->getUuid(),
-          ':BLOG_ID' => $item->getBlogId(),
+          ':ARTICLE_ID' => $item->getArticleId(),
           ':TITLE' => $item->getTitle(),
-          ':BODY' => $item->getBody(),
+          ':DESCRIPTION' => $item->getDescription(),
           ':STATUS' => $item->getStatus()
         ]
       );
@@ -160,7 +160,7 @@ class ArticleDao extends \App\Db\AbstractBaseDao
   /**
    * Update
    *
-   * @param  \App\Db\Article $item      [description]
+   * @param  \App\Db\Blog $item         [description]
    * @return bool                       True=Success, False=Failed
    */
   public function update(\App\Db\AbstractBaseEntity $item): bool
@@ -171,9 +171,9 @@ class ArticleDao extends \App\Db\AbstractBaseDao
         ' created_dt = :CREATED_DT, '.
         ' modified_dt = :MODIFIED_DT, '.
         ' uuid = :UUID, '.
-        ' blog_id = :BLOG_ID, '.
+        ' article_id = :ARTICLE_ID, '.
         ' title = :TITLE, '.
-        ' body = :BODY, '.
+        ' description = :DESCRIPTION, '.
         ' status = :STATUS '.
         'WHERE '.
         ' id = :ID',
@@ -181,9 +181,9 @@ class ArticleDao extends \App\Db\AbstractBaseDao
           ':CREATED_DT' => $item->getCreatedDt(),
           ':MODIFIED_DT' => $item->getModifiedDt(),
           ':UUID' => $item->getUuid(),
-          ':BLOG_ID' => $item->getBlogId(),
+          ':ARTICLE_ID' => $item->getArticleId(),
           ':TITLE' => $item->getTitle(),
-          ':BODY' => $item->getBody(),
+          ':DESCRIPTION' => $item->getDescription(),
           ':STATUS' => $item->getStatus()
           ':ID' => $item->getId()
         ]

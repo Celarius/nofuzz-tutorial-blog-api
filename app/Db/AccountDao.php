@@ -12,8 +12,6 @@ class AccountDao extends \App\Db\AbstractBaseDao
 {
   /**
    * Constructor
-   *
-   * @param \Nofuzz\Database\PdoConnectionInterface $connection
    */
   public function __construct(string $connectionName)
   {
@@ -102,46 +100,83 @@ class AccountDao extends \App\Db\AbstractBaseDao
       );
   }
 
+  /**
+   * Get records by keywords
+   *
+   * @param  array $keywords
+   * @return array
+   */
+  public function fetchByKeywords(array $keywords=[])
+  {
+    $where = '';
+    $order = '';
+    $binds = [];
+
+    if (!empty($keywords['name'])) {
+      $where .= 'AND (login_name LIKE :Q1 or first_name LIKE :Q2 OR last_name LIKE :Q3 or email LIKE :Q4) ';
+      $binds[':Q1'] = $keywords['q'];
+      $binds[':Q2'] = $keywords['q'];
+      $binds[':Q3'] = $keywords['q'];
+      $binds[':Q4'] = $keywords['q'];
+    }
+
+    if (!empty($where)) {
+      $where = 'WHERE '.ltrim($where,'AND ');
+    }
+
+    if (!empty($keywords['order'])) {
+      // Note here that we use the $keyword['order'] directly in SQL string.
+      // so MAKE SURE you have control over what comes in here ...
+      $order = ' ORDER BY '.$keywords['order'];
+    }
+
+    return
+      $this->fetchCustom(
+        'SELECT * FROM {table} '.$where.$order,
+        $binds
+      );
+  }
+
 
   /**
    * Insert
    *
-   * @param  \App\Db\Account $account [description]
-   * @return bool                     True=Success, False=Failed
+   * @param  \App\Db\Account $item      [description]
+   * @return bool                       True=Success, False=Failed
    */
-  public function insert(\App\Db\AbstractBaseEntity &$account): bool
+  public function insert(\App\Db\AbstractBaseEntity &$item): bool
   {
     $id =
-      $this->execCustom(
+      $this->execCustomGetLastId(
         'INSERT INTO {table} '.
         ' ( uuid, login_name, first_name, last_name, email, jwt_secret, pw_salt, pw_hash, pw_iterations, status) '.
         'VALUES '.
         ' (:UUID,:LOGIN_NAME,:FIRST_NAME,:LAST_NAME,:EMAIL,:JWT_SECRET,:PW_SALT,:PW_HASH,:PW_ITERATIONS,:STATUS)',
         [
-          ':UUID' => $account->getUuid(),
-          ':LOGIN_NAME' => $account->getLoginName(),
-          ':FIRST_NAME' => $account->getFirstName(),
-          ':LAST_NAME' => $account->getLastName(),
-          ':EMAIL' => $account->getEmail(),
-          ':JWT_SECRET' => $account->getJwtSecret(),
-          ':PW_SALT' => $account->getPwSalt(),
-          ':PW_HASH' => $account->getPwHash(),
-          ':PW_ITERATIONS' => $account->getPwIterations(),
-          ':STATUS' => $account->getStatus()
+          ':UUID' => $item->getUuid(),
+          ':LOGIN_NAME' => $item->getLoginName(),
+          ':FIRST_NAME' => $item->getFirstName(),
+          ':LAST_NAME' => $item->getLastName(),
+          ':EMAIL' => $item->getEmail(),
+          ':JWT_SECRET' => $item->getJwtSecret(),
+          ':PW_SALT' => $item->getPwSalt(),
+          ':PW_HASH' => $item->getPwHash(),
+          ':PW_ITERATIONS' => $item->getPwIterations(),
+          ':STATUS' => $item->getStatus()
         ]
       );
 
-    $account->setId($id);
+    $item->setId($id);
 
-    return true;
+    return ($id !=0);
   }
 
 
   /**
    * Update
    *
-   * @param  \App\Db\Account $account [description]
-   * @return bool                     True=Success, False=Failed
+   * @param  \App\Db\Account $item      [description]
+   * @return bool                       True=Success, False=Failed
    */
   public function update(\App\Db\AbstractBaseEntity $item): bool
   {
@@ -161,17 +196,17 @@ class AccountDao extends \App\Db\AbstractBaseDao
         'WHERE '.
         ' id = :ID',
         [
-          ':UUID' => $account->getUuid(),
-          ':LOGIN_NAME' => $account->getLoginName(),
-          ':FIRST_NAME' => $account->getFirstName(),
-          ':LAST_NAME' => $account->getLastName(),
-          ':EMAIL' => $account->getEmail(),
-          ':JWT_SECRET' => $account->getJwtSecret(),
-          ':PW_SALT' => $account->getPwSalt(),
-          ':PW_HASH' => $account->getPwHash(),
-          ':PW_ITERATIONS' => $account->getPwIterations(),
-          ':STATUS' => $account->getStatus(),
-          ':ID' => $account->getId()
+          ':UUID' => $item->getUuid(),
+          ':LOGIN_NAME' => $item->getLoginName(),
+          ':FIRST_NAME' => $item->getFirstName(),
+          ':LAST_NAME' => $item->getLastName(),
+          ':EMAIL' => $item->getEmail(),
+          ':JWT_SECRET' => $item->getJwtSecret(),
+          ':PW_SALT' => $item->getPwSalt(),
+          ':PW_HASH' => $item->getPwHash(),
+          ':PW_ITERATIONS' => $item->getPwIterations(),
+          ':STATUS' => $item->getStatus(),
+          ':ID' => $item->getId()
         ]
       );
   }

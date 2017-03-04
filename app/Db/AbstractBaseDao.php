@@ -16,9 +16,9 @@ interface AbstractBaseDaoInterface
   function execCustom(string $sql, array $params=[]): bool;
   function execCustomGetLastId(string $sql, array $params=[]): int;
 
-  function insert(\App\Db\AbstractBaseEntity $item): bool;
+  function insert(\App\Db\AbstractBaseEntity &$item): bool;
   function update(\App\Db\AbstractBaseEntity $item): bool;
-  function delete(\App\Db\AbstractBaseEntity $item): bool;
+  function delete(\App\Db\AbstractBaseEntity &$item): bool;
 
   function getTable(): string;
   function setTable(string $table);

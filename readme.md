@@ -1,18 +1,17 @@
 # Nofuzz Blog Tutorial
-This is a tutorial will show how to make a Blog system REST API using the Nofuzz framework.
+This is a tutorial will show how to make a Blog system REST API using the [Nofuzz framework](https://github.com/Celarius/nofuzz-framework).
 
-The result of this tutorial is a number of endpoints, complete with middleware, authentication and reading & writing to the databases. 
+The result of this tutorial is a number of endpoints, complete with authentication and reading & writing to the database.
 
-The Tutorial will cover the following areas:
+The Tutorial covers the creation of API endpoints for:
 - Registering accounts
-- User Sign-in/Sign-out
+- Authenticating User
 - List, Create, Edit, Delete of Blogs
 - List, Create, Edit, Delete of Blog-Articles (posts)
 - List, Create, Edit, Delete of Blog-Article-Comments
 
 The API will __NOT__ cover the following:
 - A user interface (web page) for the Blog
-- EMail send/receive features
 
 ## Install
 Download the repository to a new directory, and configure your web server to point to the `/public` folder.
@@ -23,24 +22,21 @@ $ composer update -o --no-dev
 ```
 
 ## Configure
-Change the values in `app/Config/config.json` to mach your setup. Specifically the Database Host and Usernam & Password must be changed to match your config.
+Change the values in `app/Config/config.json` to mach your setup. Specifically the Database Host and Username & Password must be changed to match your config.
 
 
----
 # Things to know before you start
 
 ## Authentication and Authorization
 Only the Registeration and SignIn endpoints have no authentication checks. The other API endpoints will use a `JWT token` (See [jwt.io](https://jwt.io)) to authenticate the requests.
 
-A `JWT Token` is obtained by calling the SignIn endpoint with correct credentials. Once obtained it needs to be passed to all other endpints via the `Authorization: Bearer <token>` header.
+A `JWT Token` is obtained by calling the SignIn endpoint with correct credentials. Once obtained a client needs to pass the token to all other endpints via the `Authorization: Bearer <token>` header.
 
 ## Models
 The JSON models of all the tables are docuemnted in the [Models.md](doc/models.md)
 
 
----
 # Tutorial
-
 *Design the application - Steps*
 The following steps were taken when designing this tutorial application:
 

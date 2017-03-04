@@ -40,7 +40,7 @@
             "host": "192.168.0.10",
             "port": 3306,
             "username": "admin",
-            "password": "*****",
+            "password": "admin",
             "charset": "UTF8",
             "options": [
                 {"ATTR_PERSISTENT": true},
