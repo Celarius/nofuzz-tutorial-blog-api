@@ -13,7 +13,7 @@
 
 namespace App\Controllers\v1;
 
-class SignOutController extends \Nofuzz\Controller
+class SignOutController extends \App\Controllers\v1\AbstractAuthController
 {
   /**
    * DELETE handler
@@ -23,20 +23,10 @@ class SignOutController extends \Nofuzz\Controller
    */
   public function handleDELETE(array $args)
   {
-    # Get the JWT Payload
-    $jwt = app()->container('jwt:payload');
-
-    if (!$jwt) {
-      response()
-        ->errorJson(401,'','Invalid credentials');
-
-      return true;
-    }
-
     # Send an empty body as return
     response()
       ->setCacheControl('private, no-cache, no-store')
-      ->setStatusCode( 204 ) // "No Content"
+      ->setStatusCode( 204 )
       ->setBody('');
 
     return true;
