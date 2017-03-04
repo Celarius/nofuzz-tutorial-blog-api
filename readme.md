@@ -132,6 +132,6 @@ The Middleware for the *Authenticated* endpoints are:
 No After Middleware defined.
 
 ## 6 - Routes definitions
-The `routes.json` file contains all the mappings between the Endpoints and the Controllers. We specify each endpoint, and the Controller that will handle it.
+The [`routes.json`](app/Config/routes.json) file contains all the mappings between the Endpoints and the Controllers. We specify each endpoint, and the Controller that will handle it.
 
-THe routes are divided into two groups, *Anonynnous* and *Authenticated*. For each group we specify different Middleware.
+The routes are divided into two groups, *Anonynnous* and *Authenticated*. For each group we specify different Middleware.
