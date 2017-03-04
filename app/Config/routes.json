@@ -14,7 +14,7 @@
     {
       "name": "unversioned",
       "notes": "",
-      "prefix": "",
+      "prefix": "/blog/api",
       "before": [],
       "routes": [
         { "methods":[],       "path":"/health",           "handler":"\\App\\Controllers\\HealthController" },
@@ -42,10 +42,10 @@
       ],
       "routes": [
         { "methods":"DELETE",  "path":"/signout",          "handler":"\\App\\Controllers\\v1\\SignOutController" },
-        { "methods":"",        "path":"/accounts[/{id}]",  "handler":"\\App\\Controllers\\v1\\AccountsController" },
-        { "methods":"",        "path":"/blogs[/{id}]",     "handler":"\\App\\Controllers\\v1\\BlogsController" },
-        { "methods":"",        "path":"/articles[/{id}]",  "handler":"\\App\\Controllers\\v1\\ArticlesController" },
-        { "methods":"",        "path":"/comments[/{id}]",  "handler":"\\App\\Controllers\\v1\\commentsController" }
+        { "methods":[],        "path":"/accounts[/{id}]",  "handler":"\\App\\Controllers\\v1\\AccountsController" },
+        { "methods":[],        "path":"/blogs[/{id}]",     "handler":"\\App\\Controllers\\v1\\BlogsController" },
+        { "methods":[],        "path":"/articles[/{id}]",  "handler":"\\App\\Controllers\\v1\\ArticlesController" },
+        { "methods":[],        "path":"/comments[/{id}]",  "handler":"\\App\\Controllers\\v1\\commentsController" }
       ],
       "after": []
     }

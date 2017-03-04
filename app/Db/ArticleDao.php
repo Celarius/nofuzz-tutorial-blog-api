@@ -59,10 +59,10 @@ class ArticleDao extends \App\Db\AbstractBaseDao
   /**
    * Get record by UUID
    *
-   * @param  int $UUID              The UUID
+   * @param  string $UUID              The UUID
    * @return null|object
    */
-  public function fetchByUuid(int $uuid): array
+  public function fetchByUuid(string $uuid): array
   {
     return $this->fetchCustom(
               'SELECT * FROM {table} WHERE uuid = :UUID ',

@@ -59,10 +59,10 @@ class AccountDao extends \App\Db\AbstractBaseDao
   /**
    * Get record by UUID
    *
-   * @param  int $UUID              The UUID
+   * @param  string $UUID              The UUID
    * @return null|object
    */
-  public function fetchByUuid(int $uuid): array
+  public function fetchByUuid(string $uuid): array
   {
     return $this->fetchCustom(
               'SELECT * FROM {table} WHERE uuid = :UUID ',
@@ -111,6 +111,11 @@ class AccountDao extends \App\Db\AbstractBaseDao
     $where = '';
     $order = '';
     $binds = [];
+
+    if (!empty($keywords['id'])) {
+      $where .= 'AND (id = :ID) ';
+      $binds[':ID'] = $keywords['id'];
+    }
 
     if (!empty($keywords['name'])) {
       $where .= 'AND (login_name LIKE :Q1 or first_name LIKE :Q2 OR last_name LIKE :Q3 or email LIKE :Q4) ';

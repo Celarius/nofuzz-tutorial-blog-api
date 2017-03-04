@@ -15,7 +15,6 @@ namespace App\Controllers\v1;
 
 class SignOutController extends \Nofuzz\Controller
 {
-
   /**
    * DELETE handler
    *
