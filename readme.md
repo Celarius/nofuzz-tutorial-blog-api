@@ -23,14 +23,14 @@ $ composer update -o --no-dev
 ```
 
 ## Configure
-Change the values in `/config/config.json` to mach your setup. Specifically the Database Host and Usernam & Password must be changed to match your config.
+Change the values in `app/Config/config.json` to mach your setup. Specifically the Database Host and Usernam & Password must be changed to match your config.
 
 
 ---
 # Things to know before you start
 
 ## Authentication and Authorization
-Only the Registeration and SignIn endpoints have no authentication checks. The other API endpoints will use a `JWT token` (See [jwt.io](jwt.io)) to authenticate the requests.
+Only the Registeration and SignIn endpoints have no authentication checks. The other API endpoints will use a `JWT token` (See [jwt.io](https://jwt.io)) to authenticate the requests.
 
 A `JWT Token` is obtained by calling the SignIn endpoint with correct credentials. Once obtained it needs to be passed to all other endpints via the `Authorization: Bearer <token>` header.
 
