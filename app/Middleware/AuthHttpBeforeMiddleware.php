@@ -125,18 +125,23 @@ class AuthHttpBeforeMiddleware extends \Nofuzz\Middleware
     # Get applications global secret
     $key = config()->get('application.secret');
 
-    # Decode the JWT into $payload object
     try {
+      #
+      # Authenticate the JWT payload
+      #
+      // Custom authentication code goes here
+
+      # Verify the Token, and decode the payload - will throw exception on failure
       $payload = \Nofuzz\Helpers\JWT::decode($token, $key, ['HS256']);
 
-    #
-    # Authenticate the JWT payload
-    #
-    // Custom authentication code goes here
+      # Check that there is a valid payload, then we are authenticated
+      if (!is_null($payload)) {
 
-    # Examples of verifying the fields
-    // $authenticated = $payload->exp >= time();
+        # Store the Payload in the Dependency Container for later use in controller
+        app()->container('jwt:payload',$payload);
 
+        $authenticated = true;
+      }
 
     } catch (\Exception $e) {
       # Decoding failed, invalid JWT payload
