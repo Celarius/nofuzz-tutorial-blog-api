@@ -48,12 +48,12 @@ class AccountDao extends \App\Db\AbstractBaseDao
    * @param  int $id              The id
    * @return null|object
    */
-  public function fetchById(int $id): array
+  public function fetchById(int $id)
   {
     return $this->fetchCustom(
               'SELECT * FROM {table} WHERE id = :ID ',
               [':ID' => $id]
-            );
+            )[0] ?? null;
   }
 
   /**
@@ -62,12 +62,12 @@ class AccountDao extends \App\Db\AbstractBaseDao
    * @param  string $UUID              The UUID
    * @return null|object
    */
-  public function fetchByUuid(string $uuid): array
+  public function fetchByUuid(string $uuid)
   {
     return $this->fetchCustom(
               'SELECT * FROM {table} WHERE uuid = :UUID ',
               [':UUID' => $uuid]
-            );
+            )[0] ?? null;
   }
 
   /**
@@ -82,7 +82,7 @@ class AccountDao extends \App\Db\AbstractBaseDao
       $this->fetchCustom(
         'SELECT * FROM {table} WHERE login_name = :LOGIN_NAME',
         [':LOGIN_NAME' => $loginName]
-      );
+      )[0] ?? null;
   }
 
   /**
@@ -97,7 +97,7 @@ class AccountDao extends \App\Db\AbstractBaseDao
       $this->fetchCustom(
         'SELECT * FROM {table} WHERE email = :EMAIL',
         [':EMAIL' => $email]
-      );
+      )[0] ?? null;
   }
 
   /**

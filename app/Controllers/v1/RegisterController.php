@@ -94,6 +94,7 @@ class RegisterController extends \Nofuzz\Controller
         ->setCacheControl('private, no-cache, no-store')
         ->setStatusCode( 200 )
         ->setJsonBody( $account->asArray() );
+
     } else {
       # Generate Response
       response()

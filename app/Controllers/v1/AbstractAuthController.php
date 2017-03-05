@@ -35,14 +35,18 @@ class AbstractAuthController extends \Nofuzz\Controller
     }
 
     # Fetch the associated account (should exist, unless we deleted it since issuing JWT)
-    $accounts = (new \App\Db\AccountDao('blog_db'))->fetchByUuid($this->jwt->uuid);
-    if (count($accounts)>0) {
-      $this->account = $accounts[0];
+    $account = (new \App\Db\AccountDao('blog_db'))->fetchByUuid($this->jwt->uuid);
+    if ($account) {
+      $this->account = $account;
 
       return parent::handle($args);
+
+    } else {
+      response()
+        ->errorJson(401,'','Invalid credentials. Token.uuid account not found');
     }
 
-    return false;
+    return true;
   }
 
 }

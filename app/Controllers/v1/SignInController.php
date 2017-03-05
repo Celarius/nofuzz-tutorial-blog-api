@@ -51,13 +51,11 @@ class SignInController extends \Nofuzz\Controller
     # Load the Account based on LOGIN_NAME or EMAIL
     if (!empty($params['login_name'])) {
       # Load the account specific by "login_name"
-      $accounts = (new \App\Db\AccountDao('blog_db'))->fetchByLoginName($params['login_name']);
-      $account = $accounts[0] ?? null;
+      $account = (new \App\Db\AccountDao('blog_db'))->fetchByLoginName($params['login_name']);
     } else
     if (!empty($params['email'])) {
       # Load the account specific by "email"
-      $accounts = (new \App\Db\AccountDao('blog_db'))->fetchByEMail($params['email']);
-      $account = $accounts[0] ?? null;
+      $account = (new \App\Db\AccountDao('blog_db'))->fetchByEMail($params['email']);
     }
 
     if ($account) {
@@ -71,8 +69,8 @@ class SignInController extends \Nofuzz\Controller
         $payload['first_name'] = $account->getFirstName();
         $payload['last_name'] = $account->getLastName();
 
-        $headers['iat'] = time();        // now in UTC
-        $headers['exp'] = time() + 3600; // 1 hour expiration time
+        $payload['iat'] = time();        // now in UTC
+        $payload['exp'] = time() + 3600; // 1 hour expiration time
 
         $key = config()->get('application.secret');
         $jwtToken = \Nofuzz\Helpers\Jwt::encode($payload, $key, 'HS256', null, $headers);

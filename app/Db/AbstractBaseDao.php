@@ -66,7 +66,7 @@ abstract class AbstractBaseDao extends \Nofuzz\Database\BaseDao implements Abstr
       $this->commit();
 
     } catch (\Exception $e) {
-      logger()->critical($e->getMessage(),['rid'=>app('requestId'),'trace'=>$e->getTraceAsString()]);
+      logger()->critical($e->getMessage(),['rid'=>app('requestId'),'msg'=>$e->getMessage(),'trace'=>$e->getTraceAsString()]);
 
       $this->rollback();
     }
@@ -105,7 +105,7 @@ abstract class AbstractBaseDao extends \Nofuzz\Database\BaseDao implements Abstr
       $this->commit();
 
     } catch (\Exception $e) {
-      logger()->critical($e->getMessage(),['rid'=>app('requestId'),'trace'=>$e->getTraceAsString()]);
+      logger()->critical($e->getMessage(),['rid'=>app('requestId'),'msg'=>$e->getMessage(),'trace'=>$e->getTraceAsString()]);
 
       $this->rollback();
     }
@@ -147,7 +147,7 @@ abstract class AbstractBaseDao extends \Nofuzz\Database\BaseDao implements Abstr
       $this->commit();
 
     } catch (\Exception $e) {
-      logger()->critical($e->getMessage(),['rid'=>app('requestId'),'trace'=>$e->getTraceAsString()]);
+      logger()->critical($e->getMessage(),['rid'=>app('requestId'),'msg'=>$e->getMessage(),'trace'=>$e->getTraceAsString()]);
 
       $this->rollback();
     }

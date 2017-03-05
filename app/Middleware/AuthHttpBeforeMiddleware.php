@@ -61,7 +61,6 @@ class AuthHttpBeforeMiddleware extends \Nofuzz\Middleware
       $type = 'Basic'; // default method. Change as needed
       response()
         ->setStatusCode(403);
-
     }
 
     # Failed ?
@@ -136,7 +135,6 @@ class AuthHttpBeforeMiddleware extends \Nofuzz\Middleware
 
       # Check that there is a valid payload, then we are authenticated
       if (!is_null($payload)) {
-
         # Store the Payload in the Dependency Container for later use in controller
         app()->container('jwt:payload',$payload);
 
@@ -145,6 +143,7 @@ class AuthHttpBeforeMiddleware extends \Nofuzz\Middleware
 
     } catch (\Exception $e) {
       # Decoding failed, invalid JWT payload
+      logger()->critical($e->getMessage(),['rid'=>app('requestId'),'msg'=>$e->getMessage(),'trace'=>$e->getTraceAsString()]);
 
     }
 
