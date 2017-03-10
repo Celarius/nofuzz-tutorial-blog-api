@@ -1,32 +1,49 @@
 <?php
 /**
- * tokens.php
+ * Token.php
  *
- * @package     Nofuzz-blog-tutorial
+ * @since    2017-03-07 20:52:50
+ * @package  Nofuzz Appliction
  */
+#########################################################################################
+/*
+JSON Model:
+{
+  "id": 0,
+  "created_dt": "",
+  "modified_dt": "",
+  "sessionid": "string",
+  "account_id": 0,
+  "expires_dt": "",
+  "status": 0
+}
+*/
 #########################################################################################
 
 namespace App\Db;
 
+/**
+ * Class representing rows in table 'blog_tokens'
+ */
 class Token extends \App\Db\AbstractBaseEntity
 {
-  protected $id = null;                            // id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY
-  protected $created_dt = null;                    // created_dt TIMESTAMP
-  protected $modified_dt = null;                   // modified_dt TIMESTAMP
-  protected $sessionid = '';                       // sessionid NVarChar(64) COLLATE utf8_general_ci
-  protected $account_id = null;                    // account_id BIGINT NOT NULL
-  protected $expires_dt = null;                    // expires_dt TIMESTAMP
-  protected $status = null;                        // status SMALLINT DEFAULT 0
+  protected $id;                                   // id BigInt(20) NOT NULL AUTO_INCREMENT
+  protected $created_dt;                           // created_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  protected $modified_dt;                          // modified_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  protected $sessionid;                            // sessionid NVarChar(64) COLLATE utf8_general_ci
+  protected $account_id;                           // account_id BigInt(20) NOT NULL
+  protected $expires_dt;                           // expires_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  protected $status;                               // status SmallInt(6) DEFAULT 0
 
   public function clear()
   {
-    $this->setId(null);
-    $this->setCreatedDt(null);
-    $this->setModifiedDt(null);
-    $this->setAccountId(null);
+    $this->setId(0);
+    $this->setCreatedDt((new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    $this->setModifiedDt((new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
     $this->setSessionid('');
-    $this->setExpiresDt(null);
-    $this->setStatus(null);
+    $this->setAccountId(0);
+    $this->setExpiresDt((new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    $this->setStatus(0);
 
     return $this;
   }
@@ -46,13 +63,13 @@ class Token extends \App\Db\AbstractBaseEntity
 
   public function fromArray(array $a)
   {
-    $this->setId($a['id'] ?? null);
-    $this->setCreatedDt($a['created_dt'] ?? null);
-    $this->setModifiedDt($a['modified_dt'] ?? null);
+    $this->setId($a['id'] ?? 0);
+    $this->setCreatedDt($a['created_dt'] ?? (new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    $this->setModifiedDt($a['modified_dt'] ?? (new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
     $this->setSessionid($a['sessionid'] ?? '');
-    $this->setAccountId($a['account_id'] ?? null);
-    $this->setExpiresDt($a['expires_dt'] ?? null);
-    $this->setStatus($a['status'] ?? null);
+    $this->setAccountId($a['account_id'] ?? 0);
+    $this->setExpiresDt($a['expires_dt'] ?? (new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    $this->setStatus($a['status'] ?? 0);
 
     return $this;
   }
@@ -115,25 +132,6 @@ class Token extends \App\Db\AbstractBaseEntity
   }
 
   /**
-   * Get AccountId
-   * @return int
-   */
-  public function getAccountId()
-  {
-    return $this->account_id;
-  }
-
-  /**
-   * Set AccountId
-   * @param   int $account_id
-   */
-  public function setAccountId($account_id)
-  {
-    $this->account_id = $account_id;
-    return $this;
-  }
-
-  /**
    * Get Sessionid
    * @return string
    */
@@ -149,6 +147,25 @@ class Token extends \App\Db\AbstractBaseEntity
   public function setSessionid($sessionid)
   {
     $this->sessionid = $sessionid;
+    return $this;
+  }
+
+  /**
+   * Get AccountId
+   * @return int
+   */
+  public function getAccountId()
+  {
+    return $this->account_id;
+  }
+
+  /**
+   * Set AccountId
+   * @param   int $account_id
+   */
+  public function setAccountId($account_id)
+  {
+    $this->account_id = $account_id;
     return $this;
   }
 

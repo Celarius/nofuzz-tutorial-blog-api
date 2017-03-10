@@ -113,7 +113,6 @@ abstract class AbstractBaseDao extends \Nofuzz\Database\BaseDao implements Abstr
     return $result;
   }
 
-
   /**
    * Execute $sql with $params
    *
@@ -194,6 +193,6 @@ abstract class AbstractBaseDao extends \Nofuzz\Database\BaseDao implements Abstr
   {
     $this->table = $table;
 
-    return self;
+    return $this;
   }
 }

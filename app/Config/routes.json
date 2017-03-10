@@ -48,6 +48,16 @@
         { "methods":[],        "path":"/comments[/{id}]",  "handler":"\\App\\Controllers\\v1\\commentsController" }
       ],
       "after": []
+    },
+    {
+      "name":"Default",
+      "notes": "Default route if nothing matches",
+      "prefix": "",
+      "before": [],
+      "routes": [
+        { "methods":[],        "path":"/",                "handler":"\\App\\Controllers\\v1\\DefaultController" }
+      ],
+      "after": []
     }
   ]
 }
