@@ -1,34 +1,70 @@
-<?php
-/**
- * blog_accounts.php
+<?php 
+/** 
+ * BlogAccount.php
  *
- * @package     Nofuzz-blog-tutorial
+ *    Entity for table blog_accounts
+ *
+ *  Generated with DaoGen v0.4.3
+ *
+ * @since    2017-03-10 19:24:29
+ * @package  Nofuzz Appliction
  */
 #########################################################################################
+/*
+JSON Model:
+{
+  "id": 0,
+  "created_dt": "1970-01-01 00:00:00",
+  "modified_dt": "1970-01-01 00:00:00",
+  "uuid": "",
+  "login_name": "",
+  "first_name": "",
+  "last_name": "",
+  "email": "",
+  "jwt_secret": "",
+  "pw_salt": "",
+  "pw_hash": "",
+  "pw_iterations": 0,
+  "status": 0
+}
+*/
+#########################################################################################
+
+Use \App\Db\AbstractBaseEntity as AbstractBaseEntity;
 
 namespace App\Db;
 
-class Account extends \App\Db\AbstractBaseEntity
+/** 
+ * Class representing rows in table "blog_accounts"
+ * 
+ * @uses     \App\Db\AbstractBaseEntity
+ */
+class BlogAccount extends AbstractBaseEntity
 {
-  protected $id = '';                              // id BigInt(20) NOT NULL AUTO_INCREMENT
-  protected $created_dt = null;                    // created_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-  protected $modified_dt = null;                   // modified_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-  protected $uuid = '';                            // uuid NVarChar(32) COLLATE utf8_general_ci
-  protected $login_name = '';                      // login_name NVarChar(32) COLLATE utf8_general_ci
-  protected $first_name = '';                      // first_name NVarChar(32) COLLATE utf8_general_ci
-  protected $last_name = '';                       // last_name NVarChar(32) COLLATE utf8_general_ci
-  protected $email = '';                           // email NVarChar(128)
-  protected $jwt_secret = '';                      // jwt_secret NVarChar(64) COLLATE utf8_general_ci
-  protected $pw_salt = '';                         // pw_salt NVarChar(128) COLLATE utf8_general_ci
-  protected $pw_hash = '';                         // pw_hash NVarChar(128) COLLATE utf8_general_ci
-  protected $pw_iterations = 0;                    // pw_iterations Integer(11) DEFAULT 1
-  protected $status = 0;                           // status SmallInt(6) DEFAULT 0
+  protected $id;                                // id BigInt(20) NOT NULL AUTO_INCREMENT
+  protected $created_dt;                        // created_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  protected $modified_dt;                       // modified_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  protected $uuid;                              // uuid NVarChar(64) COLLATE utf8_general_ci
+  protected $login_name;                        // login_name NVarChar(32) COLLATE utf8_general_ci
+  protected $first_name;                        // first_name NVarChar(32) COLLATE utf8_general_ci
+  protected $last_name;                         // last_name NVarChar(32) COLLATE utf8_general_ci
+  protected $email;                             // email NVarChar(128) COLLATE utf8_general_ci
+  protected $jwt_secret;                        // jwt_secret NVarChar(64) COLLATE utf8_general_ci
+  protected $pw_salt;                           // pw_salt NVarChar(128) COLLATE utf8_general_ci
+  protected $pw_hash;                           // pw_hash NVarChar(128) COLLATE utf8_general_ci
+  protected $pw_iterations;                     // pw_iterations Integer(11) DEFAULT 1
+  protected $status;                            // status SmallInt(6) DEFAULT 0
 
+  /**
+   * Clear properties to default values
+   *
+   * @return   self
+   */
   public function clear()
   {
-    $this->setId('');
-    $this->setCreatedDt((new \DateTime('now',new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
-    $this->setModifiedDt((new \DateTime('now',new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    $this->setId(0);
+    $this->setCreatedDt((new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    $this->setModifiedDt((new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
     $this->setUuid('');
     $this->setLoginName('');
     $this->setFirstName('');
@@ -43,6 +79,11 @@ class Account extends \App\Db\AbstractBaseEntity
     return $this;
   }
 
+  /**
+   * Return object as array
+   *
+   * @return   array
+   */
   public function asArray(): array
   {
     $result['id'] = $this->getId();
@@ -62,11 +103,16 @@ class Account extends \App\Db\AbstractBaseEntity
     return $result;
   }
 
+  /**
+   * Set properties from array
+   *
+   * @return   self
+   */
   public function fromArray(array $a)
   {
-    $this->setId($a['id'] ?? '');
-    $this->setCreatedDt($a['created_dt'] ?? (new \DateTime('now',new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
-    $this->setModifiedDt($a['modified_dt'] ?? (new \DateTime('now',new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    $this->setId($a['id'] ?? 0);
+    $this->setCreatedDt($a['created_dt'] ?? (new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    $this->setModifiedDt($a['modified_dt'] ?? (new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
     $this->setUuid($a['uuid'] ?? '');
     $this->setLoginName($a['login_name'] ?? '');
     $this->setFirstName($a['first_name'] ?? '');
@@ -81,251 +127,161 @@ class Account extends \App\Db\AbstractBaseEntity
     return $this;
   }
 
-  /**
-   * Get Id
-   * @return
-   */
   public function getId()
   {
     return $this->id;
   }
 
-  /**
-   * Set Id
-   * @param    $id
-   */
   public function setId($id)
   {
-    $this->id = $id;
+    $this->id = (int) $id;
+
     return $this;
   }
 
-  /**
-   * Get CreatedDt
-   * @return string
-   */
   public function getCreatedDt()
   {
     return $this->created_dt;
   }
 
-  /**
-   * Set CreatedDt
-   * @param   string $created_dt
-   */
   public function setCreatedDt($created_dt)
   {
     $this->created_dt = (new \DateTime($created_dt,new \DateTimeZone("UTC")))->format("Y-m-d H:i:s");
+
     return $this;
   }
 
-  /**
-   * Get ModifiedDt
-   * @return string
-   */
   public function getModifiedDt()
   {
     return $this->modified_dt;
   }
 
-  /**
-   * Set ModifiedDt
-   * @param   string $modified_dt
-   */
   public function setModifiedDt($modified_dt)
   {
     $this->modified_dt = (new \DateTime($modified_dt,new \DateTimeZone("UTC")))->format("Y-m-d H:i:s");
+
     return $this;
   }
 
-  /**
-   * Get Uuid
-   * @return string
-   */
   public function getUuid()
   {
     return $this->uuid;
   }
 
-  /**
-   * Set Uuid
-   * @param   string $uuid
-   */
   public function setUuid($uuid)
   {
     $this->uuid = $uuid;
+
     return $this;
   }
 
-  /**
-   * Get LoginName
-   * @return string
-   */
   public function getLoginName()
   {
     return $this->login_name;
   }
 
-  /**
-   * Set LoginName
-   * @param   string $login_name
-   */
   public function setLoginName($login_name)
   {
     $this->login_name = $login_name;
+
     return $this;
   }
 
-  /**
-   * Get FirstName
-   * @return string
-   */
   public function getFirstName()
   {
     return $this->first_name;
   }
 
-  /**
-   * Set FirstName
-   * @param   string $first_name
-   */
   public function setFirstName($first_name)
   {
     $this->first_name = $first_name;
+
     return $this;
   }
 
-  /**
-   * Get LastName
-   * @return string
-   */
   public function getLastName()
   {
     return $this->last_name;
   }
 
-  /**
-   * Set LastName
-   * @param   string $last_name
-   */
   public function setLastName($last_name)
   {
     $this->last_name = $last_name;
+
     return $this;
   }
 
-  /**
-   * Get Email
-   * @return string
-   */
   public function getEmail()
   {
     return $this->email;
   }
 
-  /**
-   * Set Email
-   * @param   string $email
-   */
   public function setEmail($email)
   {
     $this->email = $email;
+
     return $this;
   }
 
-  /**
-   * Get JwtSecret
-   * @return string
-   */
   public function getJwtSecret()
   {
     return $this->jwt_secret;
   }
 
-  /**
-   * Set JwtSecret
-   * @param   string $jwt_secret
-   */
   public function setJwtSecret($jwt_secret)
   {
     $this->jwt_secret = $jwt_secret;
+
     return $this;
   }
 
-  /**
-   * Get PwSalt
-   * @return string
-   */
   public function getPwSalt()
   {
     return $this->pw_salt;
   }
 
-  /**
-   * Set PwSalt
-   * @param   string $pw_salt
-   */
   public function setPwSalt($pw_salt)
   {
     $this->pw_salt = $pw_salt;
+
     return $this;
   }
 
-  /**
-   * Get PwHash
-   * @return string
-   */
   public function getPwHash()
   {
     return $this->pw_hash;
   }
 
-  /**
-   * Set PwHash
-   * @param   string $pw_hash
-   */
   public function setPwHash($pw_hash)
   {
     $this->pw_hash = $pw_hash;
+
     return $this;
   }
 
-  /**
-   * Get PwIterations
-   * @return
-   */
   public function getPwIterations()
   {
     return $this->pw_iterations;
   }
 
-  /**
-   * Set PwIterations
-   * @param    $pw_iterations
-   */
   public function setPwIterations($pw_iterations)
   {
-    $this->pw_iterations = $pw_iterations;
+    $this->pw_iterations = (int) $pw_iterations;
+
     return $this;
   }
 
-  /**
-   * Get Status
-   * @return int
-   */
   public function getStatus()
   {
     return $this->status;
   }
 
-  /**
-   * Set Status
-   * @param   int $status
-   */
   public function setStatus($status)
   {
-    $this->status = $status;
+    $this->status = (int) $status;
+
     return $this;
   }
 
 } // EOC
+

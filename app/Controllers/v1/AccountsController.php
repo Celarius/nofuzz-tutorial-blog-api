@@ -24,7 +24,7 @@ class AccountsController extends \App\Controllers\v1\AbstractAuthController
     $parQ = queryParam('q');
 
     # Fetch all accounts
-    $accounts = (new \App\Db\AccountDao('blog_db'))->fetchByKeywords(['id'=>$parId]);
+    $accounts = (new \App\Db\BlogAccountDao('blog_db'))->fetchByKeywords(['id'=>$parId]);
 
     # Convert to array
     $data = [];
@@ -60,7 +60,7 @@ class AccountsController extends \App\Controllers\v1\AbstractAuthController
 
         return true;
     } else {
-      $acc = (new \App\Db\AccountDao('blog_db'))->fetchByLoginName($body['login_name']);
+      $acc = (new \App\Db\BlogAccountDao('blog_db'))->fetchByLoginName($body['login_name']);
       if ($acc) {
         response()
           ->errorJson(400,'','Account already exists with {login_name}');
@@ -76,7 +76,7 @@ class AccountsController extends \App\Controllers\v1\AbstractAuthController
 
         return true;
     } else {
-      $acc = (new \App\Db\AccountDao('blog_db'))->fetchByEmail($body['email']);
+      $acc = (new \App\Db\BlogAccountDao('blog_db'))->fetchByEmail($body['email']);
       if ($acc) {
         response()
           ->errorJson(400,'','Account already exists with {email}');
@@ -94,7 +94,7 @@ class AccountsController extends \App\Controllers\v1\AbstractAuthController
     }
 
     # Create a new ccount
-    $account = new \App\Db\Account( $body );
+    $account = new \App\Db\BlogAccount( $body );
 
     # Overwrite a few params, calculate password hash etc.
     $account->setUuid( \Nofuzz\Helpers\UUID::generate() );
@@ -102,7 +102,7 @@ class AccountsController extends \App\Controllers\v1\AbstractAuthController
     $account->setPwHash( \Nofuzz\Helpers\Hash::generate($account->getUuid().$body['password']) );
 
     # Insert into DB
-    if ((new \App\Db\AccountDao('blog_db'))->insert($account)) {
+    if ((new \App\Db\BlogAccountDao('blog_db'))->insert($account)) {
       # Generate Response
       response()
         ->setCacheControl('private, no-cache, no-store')
@@ -141,11 +141,11 @@ class AccountsController extends \App\Controllers\v1\AbstractAuthController
     }
 
     # Fetch the Account based on UUID
-    $account = (new \App\Db\AccountDao('blog_db'))->fetchByUuid($body['uuid']);
+    $account = (new \App\Db\BlogAccountDao('blog_db'))->fetchByUuid($body['uuid']);
 
     # Check & verify login_name - if present & different
     if (!empty($body['login_name']) && strcasecmp($body['login_name'],$account->getLoginName())!=0 ) {
-      $acc = (new \App\Db\AccountDao('blog_db'))->fetchByLoginName($body['login_name']);
+      $acc = (new \App\Db\BlogAccountDao('blog_db'))->fetchByLoginName($body['login_name']);
       if ($acc) {
         response()
           ->errorJson(400,'','Account already exists with {login_name}');
@@ -156,7 +156,7 @@ class AccountsController extends \App\Controllers\v1\AbstractAuthController
 
     # Check & verify email - if present
     if (!empty($body['email']) && strcasecmp($body['email'],$account->getEmail())!=0 ) {
-      $acc = (new \App\Db\AccountDao('blog_db'))->fetchByEmail($body['email']);
+      $acc = (new \App\Db\BlogAccountDao('blog_db'))->fetchByEmail($body['email']);
       if ($acc) {
         response()
           ->errorJson(400,'','Account already exists with {email}');
@@ -185,7 +185,7 @@ class AccountsController extends \App\Controllers\v1\AbstractAuthController
     }
 
     # Update into DB
-    if ((new \App\Db\AccountDao('blog_db'))->update($account)) {
+    if ((new \App\Db\BlogAccountDao('blog_db'))->update($account)) {
       # Generate Response
       response()
         ->setCacheControl('private, no-cache, no-store')
@@ -215,12 +215,12 @@ class AccountsController extends \App\Controllers\v1\AbstractAuthController
     # Check if /{id} given, if so load the account
     $parId = $args['id'];
     if (!empty($parId)) {
-      $account = (new \App\Db\AccountDao('blog_db'))->fetchById($parId);
+      $account = (new \App\Db\BlogAccountDao('blog_db'))->fetchById($parId);
 
     } else {
       # Else check if there was a QueryParam ?uuid=<uuid>, and load account based on that
       $uuid = queryParam('uuid');
-      $account = (new \App\Db\AccountDao('blog_db'))->fetchByUuid($uuid);
+      $account = (new \App\Db\BlogAccountDao('blog_db'))->fetchByUuid($uuid);
 
     }
 
@@ -232,7 +232,7 @@ class AccountsController extends \App\Controllers\v1\AbstractAuthController
         return true;
     }
 
-    if ((new \App\Db\AccountDao('blog_db'))->delete($account)) {
+    if ((new \App\Db\BlogAccountDao('blog_db'))->delete($account)) {
       response()
         ->setCacheControl('private, no-cache, no-store')
         ->setStatusCode( 204 )

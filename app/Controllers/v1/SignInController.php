@@ -51,11 +51,11 @@ class SignInController extends \Nofuzz\Controller
     # Load the Account based on LOGIN_NAME or EMAIL
     if (!empty($params['login_name'])) {
       # Load the account specific by "login_name"
-      $account = (new \App\Db\AccountDao('blog_db'))->fetchByLoginName($params['login_name']);
+      $account = (new \App\Db\BlogAccountDao('blog_db'))->fetchByLoginName($params['login_name']);
     } else
     if (!empty($params['email'])) {
       # Load the account specific by "email"
-      $account = (new \App\Db\AccountDao('blog_db'))->fetchByEMail($params['email']);
+      $account = (new \App\Db\BlogAccountDao('blog_db'))->fetchByEMail($params['email']);
     }
 
     if ($account) {

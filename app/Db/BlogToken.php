@@ -1,8 +1,12 @@
-<?php
-/**
- * Token.php
+<?php 
+/** 
+ * BlogToken.php
  *
- * @since    2017-03-07 20:52:50
+ *    Entity for table blog_tokens
+ *
+ *  Generated with DaoGen v0.4.3
+ *
+ * @since    2017-03-10 19:24:29
  * @package  Nofuzz Appliction
  */
 #########################################################################################
@@ -10,31 +14,40 @@
 JSON Model:
 {
   "id": 0,
-  "created_dt": "",
-  "modified_dt": "",
-  "sessionid": "string",
+  "created_dt": "1970-01-01 00:00:00",
+  "modified_dt": "1970-01-01 00:00:00",
+  "sessionid": "",
   "account_id": 0,
-  "expires_dt": "",
+  "expires_dt": "1970-01-01 00:00:00",
   "status": 0
 }
 */
 #########################################################################################
 
+Use \App\Db\AbstractBaseEntity as AbstractBaseEntity;
+
 namespace App\Db;
 
-/**
- * Class representing rows in table 'blog_tokens'
+/** 
+ * Class representing rows in table "blog_tokens"
+ * 
+ * @uses     \App\Db\AbstractBaseEntity
  */
-class Token extends \App\Db\AbstractBaseEntity
+class BlogToken extends AbstractBaseEntity
 {
-  protected $id;                                   // id BigInt(20) NOT NULL AUTO_INCREMENT
-  protected $created_dt;                           // created_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-  protected $modified_dt;                          // modified_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-  protected $sessionid;                            // sessionid NVarChar(64) COLLATE utf8_general_ci
-  protected $account_id;                           // account_id BigInt(20) NOT NULL
-  protected $expires_dt;                           // expires_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-  protected $status;                               // status SmallInt(6) DEFAULT 0
+  protected $id;                                // id BigInt(20) NOT NULL AUTO_INCREMENT
+  protected $created_dt;                        // created_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  protected $modified_dt;                       // modified_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  protected $sessionid;                         // sessionid NVarChar(64) COLLATE utf8_general_ci
+  protected $account_id;                        // account_id BigInt(20) NOT NULL
+  protected $expires_dt;                        // expires_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+  protected $status;                            // status SmallInt(6) DEFAULT 0
 
+  /**
+   * Clear properties to default values
+   *
+   * @return   self
+   */
   public function clear()
   {
     $this->setId(0);
@@ -48,6 +61,11 @@ class Token extends \App\Db\AbstractBaseEntity
     return $this;
   }
 
+  /**
+   * Return object as array
+   *
+   * @return   array
+   */
   public function asArray(): array
   {
     $result['id'] = $this->getId();
@@ -61,6 +79,11 @@ class Token extends \App\Db\AbstractBaseEntity
     return $result;
   }
 
+  /**
+   * Set properties from array
+   *
+   * @return   self
+   */
   public function fromArray(array $a)
   {
     $this->setId($a['id'] ?? 0);
@@ -74,137 +97,89 @@ class Token extends \App\Db\AbstractBaseEntity
     return $this;
   }
 
-  /**
-   * Get Id
-   * @return int
-   */
   public function getId()
   {
     return $this->id;
   }
 
-  /**
-   * Set Id
-   * @param   int $id
-   */
   public function setId($id)
   {
-    $this->id = $id;
+    $this->id = (int) $id;
+
     return $this;
   }
 
-  /**
-   * Get CreatedDt
-   * @return string
-   */
   public function getCreatedDt()
   {
     return $this->created_dt;
   }
 
-  /**
-   * Set CreatedDt
-   * @param   string $created_dt
-   */
   public function setCreatedDt($created_dt)
   {
     $this->created_dt = (new \DateTime($created_dt,new \DateTimeZone("UTC")))->format("Y-m-d H:i:s");
+
     return $this;
   }
 
-  /**
-   * Get ModifiedDt
-   * @return string
-   */
   public function getModifiedDt()
   {
     return $this->modified_dt;
   }
 
-  /**
-   * Set ModifiedDt
-   * @param   string $modified_dt
-   */
   public function setModifiedDt($modified_dt)
   {
     $this->modified_dt = (new \DateTime($modified_dt,new \DateTimeZone("UTC")))->format("Y-m-d H:i:s");
+
     return $this;
   }
 
-  /**
-   * Get Sessionid
-   * @return string
-   */
   public function getSessionid()
   {
     return $this->sessionid;
   }
 
-  /**
-   * Set Sessionid
-   * @param   string $sessionid
-   */
   public function setSessionid($sessionid)
   {
     $this->sessionid = $sessionid;
+
     return $this;
   }
 
-  /**
-   * Get AccountId
-   * @return int
-   */
   public function getAccountId()
   {
     return $this->account_id;
   }
 
-  /**
-   * Set AccountId
-   * @param   int $account_id
-   */
   public function setAccountId($account_id)
   {
-    $this->account_id = $account_id;
+    $this->account_id = (int) $account_id;
+
     return $this;
   }
 
-  /**
-   * Get ExpiresDt
-   * @return string
-   */
   public function getExpiresDt()
   {
     return $this->expires_dt;
   }
 
-  /**
-   * Set ExpiresDt
-   * @param   string $expires_dt
-   */
   public function setExpiresDt($expires_dt)
   {
     $this->expires_dt = (new \DateTime($expires_dt,new \DateTimeZone("UTC")))->format("Y-m-d H:i:s");
+
     return $this;
   }
 
-  /**
-   * Get Status
-   * @return int
-   */
   public function getStatus()
   {
     return $this->status;
   }
 
-  /**
-   * Set Status
-   * @param   int $status
-   */
   public function setStatus($status)
   {
-    $this->status = $status;
+    $this->status = (int) $status;
+
     return $this;
   }
 
 } // EOC
+

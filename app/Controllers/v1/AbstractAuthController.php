@@ -35,7 +35,7 @@ class AbstractAuthController extends \Nofuzz\Controller
     }
 
     # Fetch the associated account (should exist, unless we deleted it since issuing JWT)
-    $account = (new \App\Db\AccountDao('blog_db'))->fetchByUuid($this->jwt->uuid);
+    $account = (new \App\Db\BlogAccountDao('blog_db'))->fetchByUuid($this->jwt->uuid);
     if ($account) {
       $this->account = $account;
 

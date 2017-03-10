@@ -1,17 +1,33 @@
 <?php
 /**
- * AccountDao
+ * BlogAccountDao.php
  *
- * @package     Nofuzz-blog-tutorial
-*/
-################################################################################################################################
+ *    Dao class for table blog_accounts
+ *
+ *  Generated with DaoGen v0.4.3
+ *
+ * @since    2017-03-10 19:24:29
+ * @package  App\Db
+ */
+#########################################################################################
+
+Use \App\Db\AbstractBaseDao as AbstractBaseDao;
+Use \App\Db\AbstractBaseEntity as AbstractBaseEntity;
 
 namespace App\Db;
 
-class AccountDao extends \App\Db\AbstractBaseDao
+/**
+ * Dao class for rows in table "blog_accounts"
+ *
+ * @uses     \App\Db\AbstractBaseDao
+ * @uses     \App\Db\AbstractBaseEntity
+ */
+class BlogAccountDao extends AbstractBaseDao
 {
   /**
    * Constructor
+   *
+   * @param string  $connectionname    Database ConnectionName
    */
   public function __construct(string $connectionName)
   {
@@ -22,12 +38,12 @@ class AccountDao extends \App\Db\AbstractBaseDao
   /**
    * Make/Generate an Entity
    *
-   * @param  array  $fields [description]
+   * @param  array  $fields             Array with key=value for fields
    * @return object
    */
-  function makeEntity(array $fields=[]): \App\Db\AbstractBaseEntity
+  function makeEntity(array $fields=[]): AbstractBaseEntity
   {
-    return new \App\Db\Account(array_change_key_case($fields),CASE_LOWER);
+    return new \App\Db\BlogAccount(array_change_key_case($fields),CASE_LOWER);
   }
 
   /**
@@ -37,37 +53,40 @@ class AccountDao extends \App\Db\AbstractBaseDao
    */
   public function fetchAll(): array
   {
-    return $this->fetchCustom(
-              'SELECT * FROM {table}'
-            );
+    return
+      $this->fetchCustom(
+        'SELECT * FROM {table}'
+      );
   }
 
   /**
-   * Get record by Id
+   * Fetch record by Id
    *
-   * @param  int $id              The id
-   * @return null|object
+   * @param  int $id                    The id
+   * @return array|null
    */
   public function fetchById(int $id)
   {
-    return $this->fetchCustom(
-              'SELECT * FROM {table} WHERE id = :ID ',
-              [':ID' => $id]
-            )[0] ?? null;
+    return
+      $this->fetchCustom(
+        'SELECT * FROM {table} WHERE id = :ID',
+        [':ID' => $id]
+      )[0] ?? null;
   }
 
   /**
-   * Get record by UUID
+   * Fetch record by uuid
    *
-   * @param  string $UUID              The UUID
-   * @return null|object
+   * @param  string $uuid               The uuid
+   * @return array|null
    */
   public function fetchByUuid(string $uuid)
   {
-    return $this->fetchCustom(
-              'SELECT * FROM {table} WHERE uuid = :UUID ',
-              [':UUID' => $uuid]
-            )[0] ?? null;
+    return
+      $this->fetchCustom(
+        'SELECT * FROM {table} WHERE uuid = :UUID',
+        [':UUID' => $uuid]
+      )[0] ?? null;
   }
 
   /**
@@ -101,20 +120,26 @@ class AccountDao extends \App\Db\AbstractBaseDao
   }
 
   /**
-   * Get records by keywords
+   * Fetch records by Keyword
    *
-   * @param  array $keywords
+   * @param  array $keywords            Array with keyword = value
    * @return array
    */
-  public function fetchByKeywords(array $keywords=[])
+  public function fetchByKeywords(array $keywords=[]): array
   {
     $where = '';
     $order = '';
+    $limit = '';
     $binds = [];
 
     if (!empty($keywords['id'])) {
-      $where .= 'AND (id = :ID) ';
-      $binds[':ID'] = $keywords['id'];
+       $where .= 'AND (id = :ID) ';
+       $binds[':ID'] = $keywords['id'];
+    }
+
+    if (!empty($keywords['uuid'])) {
+       $where .= 'AND (uuid = :UUID) ';
+       $binds[':UUID'] = $keywords['uuid'];
     }
 
     if (!empty($keywords['name'])) {
@@ -125,39 +150,46 @@ class AccountDao extends \App\Db\AbstractBaseDao
       $binds[':Q4'] = $keywords['q'];
     }
 
-    if (!empty($where)) {
+    if (!empty($where))
       $where = 'WHERE '.ltrim($where,'AND ');
-    }
 
-    if (!empty($keywords['order'])) {
-      // Note here that we use the $keyword['order'] directly in SQL string.
-      // so MAKE SURE you have control over what comes in here ...
+    if (!empty($keywords['order'])) // Note here that we use the $keyword['order'] directly in SQL string.
       $order = ' ORDER BY '.$keywords['order'];
+
+    if (!empty($keywords['limit'])) { // Note here that we use the $keyword['limit'] directly in SQL string.
+      if (strcasecmp('mysql',$this->getConnection()->getDriver())==0) {
+        $limit = ' LIMIT '.$keywords['limit'];
+      } else
+      if (strcasecmp('firebird',$this->getConnection()->getDriver())==0) {
+        $limit = ' ROWS '.$keywords['limit'];
+      }
     }
 
     return
       $this->fetchCustom(
-        'SELECT * FROM {table} '.$where.$order,
+        'SELECT * FROM {table} '.$where.$order.$limit,
         $binds
       );
   }
 
-
   /**
-   * Insert
+   * Insert $item into database
    *
-   * @param  \App\Db\Account $item      [description]
-   * @return bool                       True=Success, False=Failed
+   * @param  \App\Db\AbstractBaseEntity $item      The item we are inserting
+   * @return bool
    */
   public function insert(\App\Db\AbstractBaseEntity &$item): bool
   {
     $id =
       $this->execCustomGetLastId(
         'INSERT INTO {table} '.
-        ' ( uuid, login_name, first_name, last_name, email, jwt_secret, pw_salt, pw_hash, pw_iterations, status) '.
+        '( id, created_dt, modified_dt, uuid, login_name, first_name, last_name, email, jwt_secret, pw_salt, pw_hash, pw_iterations, status) '.
         'VALUES '.
-        ' (:UUID,:LOGIN_NAME,:FIRST_NAME,:LAST_NAME,:EMAIL,:JWT_SECRET,:PW_SALT,:PW_HASH,:PW_ITERATIONS,:STATUS)',
+        '(:ID,:CREATED_DT,:MODIFIED_DT,:UUID,:LOGIN_NAME,:FIRST_NAME,:LAST_NAME,:EMAIL,:JWT_SECRET,:PW_SALT,:PW_HASH,:PW_ITERATIONS,:STATUS)',
         [
+          ':ID' => $item->getId(),
+          ':CREATED_DT' => $item->getCreatedDt(),
+          ':MODIFIED_DT' => $item->getModifiedDt(),
           ':UUID' => $item->getUuid(),
           ':LOGIN_NAME' => $item->getLoginName(),
           ':FIRST_NAME' => $item->getFirstName(),
@@ -176,18 +208,19 @@ class AccountDao extends \App\Db\AbstractBaseDao
     return ($id !=0);
   }
 
-
   /**
-   * Update
+   * Update $item in database
    *
-   * @param  \App\Db\Account $item      [description]
-   * @return bool                       True=Success, False=Failed
+   * @param  \App\Db\AbstractBaseEntity $item      The item we are updating
+   * @return bool
    */
   public function update(\App\Db\AbstractBaseEntity $item): bool
   {
     return
       $this->execCustom(
         'UPDATE {table} SET '.
+        ' created_dt = :CREATED_DT, '.
+        ' modified_dt = :MODIFIED_DT, '.
         ' uuid = :UUID, '.
         ' login_name = :LOGIN_NAME, '.
         ' first_name = :FIRST_NAME, '.
@@ -199,8 +232,10 @@ class AccountDao extends \App\Db\AbstractBaseDao
         ' pw_iterations = :PW_ITERATIONS, '.
         ' status = :STATUS '.
         'WHERE '.
-        ' id = :ID',
+        ' id = :ID ',
         [
+          ':CREATED_DT' => $item->getCreatedDt(),
+          ':MODIFIED_DT' => $item->getModifiedDt(),
           ':UUID' => $item->getUuid(),
           ':LOGIN_NAME' => $item->getLoginName(),
           ':FIRST_NAME' => $item->getFirstName(),
@@ -216,4 +251,5 @@ class AccountDao extends \App\Db\AbstractBaseDao
       );
   }
 
-}
+} // EOC
+

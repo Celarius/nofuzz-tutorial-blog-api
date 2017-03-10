@@ -82,13 +82,13 @@ class RegisterController extends \Nofuzz\Controller
     }
 
     # Create an account, prefill with values from array
-    $account = new \App\Db\Account($params);
+    $account = new \App\Db\BlogAccount($params);
     $account->setUuid( \Nofuzz\Helpers\UUID::generate() );
     $account->setPwSalt( \Nofuzz\Helpers\Hash::generate($account->getUuid()) );
     $account->setPwHash( \Nofuzz\Helpers\Hash::generate($account->getUuid().$params['password']) );
 
     # Insert into DB
-    if ((new \App\Db\AccountDao('blog_db'))->insert($account)) {
+    if ((new \App\Db\BlogAccountDao('blog_db'))->insert($account)) {
       # Generate Response
       response()
         ->setCacheControl('private, no-cache, no-store')
@@ -147,14 +147,14 @@ class RegisterController extends \Nofuzz\Controller
    */
   protected function validateParams(array $params=[]):bool
   {
-    $dbAccounts = (new \App\Db\AccountDao('blog_db'))->fetchByLoginName($params['login_name']);
+    $dbAccounts = (new \App\Db\BlogAccountDao('blog_db'))->fetchByLoginName($params['login_name']);
 
     if (count($dbAccounts)>0) {
       response()->errorJson(400,'','An account with {login} already exists');
       return false;
     }
 
-    $dbAccounts = (new \App\Db\AccountDao('blog_db'))->fetchByEMail($params['email']);
+    $dbAccounts = (new \App\Db\BlogAccountDao('blog_db'))->fetchByEMail($params['email']);
     if (count($dbAccounts)>0) {
       response()->errorJson(400,'','An account with {email} already exists');
       return false;
