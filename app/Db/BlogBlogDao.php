@@ -80,7 +80,7 @@ class BlogBlogDao extends AbstractBaseDao
    * @param  string $uuid               The uuid
    * @return array|null
    */
-  public function fetchById(string $uuid)
+  public function fetchByUuid(string $uuid)
   {
     return
       $this->fetchCustom(

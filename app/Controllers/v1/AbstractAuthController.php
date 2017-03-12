@@ -8,6 +8,8 @@
  * If one wants, this can be extended to delete the actual token from a
  * cache or similar, and updating the Auth check to scan this cache for
  * valid tokens..
+ *
+ * @package  Nofuzz-Tutorial-Blog
  */
 #################################################################################################################################
 

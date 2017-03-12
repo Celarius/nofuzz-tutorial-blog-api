@@ -1,19 +1,20 @@
 # Models
-These are the representations of the Tables as JSON documents/models.
+These are the representations of the Tables as JSON documents/models. These are also returned by the API Endpoints.
 
 ## Accounts
 ```json
 {
   "id": 0,
-  "created_dt": "string",
-  "modified_dt": "string",
-  "uuid": "string",
-  "login_name": "string",
-  "first_name": "string",
-  "last_name": "string",
-  "jwt_secret": "string",
-  "pw_salt": "string",
-  "pw_hash": "string",
+  "created_dt": "1970-01-01 00:00:00",
+  "modified_dt": "1970-01-01 00:00:00",
+  "uuid": "",
+  "login_name": "",
+  "first_name": "",
+  "last_name": "",
+  "email": "",
+  "jwt_secret": "",
+  "pw_salt": "",
+  "pw_hash": "",
   "pw_iterations": 0,
   "status": 0
 }
@@ -23,12 +24,12 @@ These are the representations of the Tables as JSON documents/models.
 ```json
 {
   "id": 0,
-  "created_dt": "string",
-  "modified_dt": "string",
-  "uuid": "string",
+  "created_dt": "1970-01-01 00:00:00",
+  "modified_dt": "1970-01-01 00:00:00",
+  "uuid": "",
   "account_id": 0,
-  "title": "string",
-  "description": "string",
+  "title": "",
+  "description": "",
   "status": 0
 }
 ```
@@ -37,12 +38,12 @@ These are the representations of the Tables as JSON documents/models.
 ```json
 {
   "id": 0,
-  "created_dt": "string",
-  "modified_dt": "string",
-  "uuid": "string",
+  "created_dt": "1970-01-01 00:00:00",
+  "modified_dt": "1970-01-01 00:00:00",
+  "uuid": "",
   "blog_id": 0,
-  "title": "string",
-  "body": "string",
+  "title": "",
+  "body": "",
   "status": 0
 }
 ```
@@ -51,9 +52,9 @@ These are the representations of the Tables as JSON documents/models.
 ```json
 {
   "id": 0,
-  "created_dt": "",
-  "modified_dt": "",
-  "uuid": "string",
+  "created_dt": "1970-01-01 00:00:00",
+  "modified_dt": "1970-01-01 00:00:00",
+  "uuid": "",
   "article_id": 0,
   "account_id": 0,
   "comment": "",
@@ -65,11 +66,11 @@ These are the representations of the Tables as JSON documents/models.
 ```json
 {
   "id": 0,
-  "created_dt": "string",
-  "modified_dt": "string",
+  "created_dt": "1970-01-01 00:00:00",
+  "modified_dt": "1970-01-01 00:00:00",
+  "sessionid": "",
   "account_id": 0,
-  "sessionid": "string",
-  "expires_dt": "string",
+  "expires_dt": "1970-01-01 00:00:00",
   "status": 0
 }
 ```

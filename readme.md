@@ -61,28 +61,28 @@ DELETE  /blog/api/v1/signout            Sign Out (remove session/token)
 ```
 *Accounts*
 ```txt
-GET     /blog/api/v1/accounts[/{id}]    Get account(s) 
+GET     /blog/api/v1/accounts[/{uuid}]  Get account(s) 
 POST    /blog/api/v1/accounts           Create an account
 PUT     /blog/api/v1/accounts           Update an account
 DELETE  /blog/api/v1/accounts           Remove an account
 ```
 *Blogs*
 ```txt
-GET     /blog/api/v1/blogs[/{id}]       Get blog(s)
+GET     /blog/api/v1/blogs[/{uuid}]     Get blog(s)
 POST    /blog/api/v1/blogs              Create a blog
 PUT     /blog/api/v1/blogs              Update a blog
 DELETE  /blog/api/v1/blogs              Remove a blog
 ```
 *Articles*
 ```txt
-GET     /blog/api/v1/articles[/{id}]    Get article(s)
+GET     /blog/api/v1/articles[/{uuid}]  Get article(s)
 POST    /blog/api/v1/articles           Create an article
 PUT     /blog/api/v1/articles           Update an article
 DELETE  /blog/api/v1/articles           Remove an article
 ```
 *Comments*
 ```txt
-GET     /blog/api/v1/comments[/{id}]    Get comment(s)
+GET     /blog/api/v1/comments[/{uuid}]  Get comment(s)
 POST    /blog/api/v1/comments           Create a comment
 PUT     /blog/api/v1/comments           Update a comment
 DELETE  /blog/api/v1/comments           Remove a comment
@@ -95,14 +95,14 @@ Please see [MySql Schema](doc/schema.mysql.sql) for the complete Schema DDL. Use
 > This app uses a MySQL Database by default, but is easily converted to using Firebird, PostgreSql, Oracle or any other DB.
 
 ## 4 - Controllers
-In the `/app/Controllers` folder you will find all the Controller classes for each endpoint group. These controllers are:
+In the `/app/Controllers/v1` folder you will find all the Controller classes for each endpoint group. These controllers are:
 - RegisterController.php
 - SignInController.php
 - SignOutController.php
-- AccountsController.php
-- BlogsController.php
-- ArticlesController.php
-- CommentsController.php
+- BlogAccountController.php
+- BlogBlogController.php
+- BlogArticleController.php
+- BlogCommentController.php
 
 ## 5 - Middleware
 In the `/app/Middleware` folder you will find all the Middleware classes. 
@@ -134,4 +134,4 @@ No After Middleware defined.
 ## 6 - Routes definitions
 The [`routes.json`](app/Config/routes.json) file contains all the mappings between the Endpoints and the Controllers. We specify each endpoint, and the Controller that will handle it.
 
-The routes are divided into two groups, *Anonynnous* and *Authenticated*. For each group we specify different Middleware.
+The routes are divided into two groups, *Anonymous* and *Authenticated*. For each group we specify different Middleware.

@@ -41,11 +41,11 @@
         "\\App\\Middleware\\AuthHttpBeforeMiddleware"
       ],
       "routes": [
-        { "methods":"DELETE",  "path":"/signout",          "handler":"\\App\\Controllers\\v1\\SignOutController" },
-        { "methods":[],        "path":"/accounts[/{id}]",  "handler":"\\App\\Controllers\\v1\\AccountsController" },
-        { "methods":[],        "path":"/blogs[/{id}]",     "handler":"\\App\\Controllers\\v1\\BlogsController" },
-        { "methods":[],        "path":"/articles[/{id}]",  "handler":"\\App\\Controllers\\v1\\ArticlesController" },
-        { "methods":[],        "path":"/comments[/{id}]",  "handler":"\\App\\Controllers\\v1\\commentsController" }
+        { "methods":"DELETE",  "path":"/signout",             "handler":"\\App\\Controllers\\v1\\SignOutController" },
+        { "methods":[],        "path":"/accounts[/{uuid}]",   "handler":"\\App\\Controllers\\v1\\BlogAccountController" },
+        { "methods":[],        "path":"/blogs[/{uuid}]",      "handler":"\\App\\Controllers\\v1\\BlogBlogController" },
+        { "methods":[],        "path":"/articles[/{uuid}]",   "handler":"\\App\\Controllers\\v1\\BlogArticleController" },
+        { "methods":[],        "path":"/comments[/{uuid}]",   "handler":"\\App\\Controllers\\v1\\BlogCommentController" }
       ],
       "after": []
     },

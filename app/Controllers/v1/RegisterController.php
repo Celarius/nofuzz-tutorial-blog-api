@@ -17,7 +17,7 @@
  *         instead a UI should handle the request/response from this endpoint and
  *         abstract the information.
  *
- * @package     Nofuzz-blog-tutorial
+ * @package  Nofuzz-Tutorial-Blog
  */
 #################################################################################################################################
 /*

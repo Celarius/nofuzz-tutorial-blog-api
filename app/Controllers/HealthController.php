@@ -1,6 +1,8 @@
 <?php
 /**
- * health.php
+ * Health Controller
+ *
+ * @package  Nofuzz-Tutorial-Blog
  */
 ##############################################################################
 
@@ -9,29 +11,18 @@ namespace App\Controllers;
 class HealthController extends \Nofuzz\Controller
 {
   /**
-   * All requests pass through here
-   *
-   * @param  array  $args [description]
-   * @return bool
-   */
-  public function handle(array $args)
-  {
-    # No cache
-    response()
-      ->setCacheControl('private, no-cache, no-store');
-
-    return parent::handle($args);
-  }
-
-  /**
    * Handle GET requests
    *
    * @return  bool
    */
   public function handleGET(array $args)
   {
+    # No cache
+    response()
+      ->setCacheControl('private, no-cache, no-store');
+
+    # Check Maintenance Mode
     if ( config()->get('application.global.maintenance',false) ) {
-      # Maintenance Mode
       $data= ['result'=>'Maintenenace Mode',
               'message'=>config()->get('application.global.message','')];
       response()
@@ -40,6 +31,10 @@ class HealthController extends \Nofuzz\Controller
     } else {
       # All ok
       $data= ['result'=>'OK'];
+
+      response()
+        ->setStatusCode( 200 );
+
     }
 
     response()

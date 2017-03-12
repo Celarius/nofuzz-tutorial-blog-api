@@ -5,6 +5,8 @@
  * Authenticates an account based on {login_name} or {email} and {password}.
  * Generates a JWT response if successful, that can be used in successive
  * API calls.
+ *
+ * @package  Nofuzz-Tutorial-Blog
  */
 #################################################################################################################################
 /*
