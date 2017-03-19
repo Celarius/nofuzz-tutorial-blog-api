@@ -4,35 +4,32 @@
  *
  *    Dao class for table blog_comments
  *
- *  Generated with DaoGen v0.4.3
+ *  Generated with DaoGen v0.4.8
  *
- * @since    2017-03-10 19:24:29
+ * @since    2017-03-18 21:42:54
  * @package  App\Db
  */
 #########################################################################################
 
-Use \App\Db\AbstractBaseDao as AbstractBaseDao;
-Use \App\Db\AbstractBaseEntity as AbstractBaseEntity;
+Use App\Db\AbstractBaseEntity as AbstractBaseEntity;
 
 namespace App\Db;
 
 /**
  * Dao class for rows in table "blog_comments"
- *
- * @uses     \App\Db\AbstractBaseDao
- * @uses     \App\Db\AbstractBaseEntity
  */
-class BlogCommentDao extends AbstractBaseDao
+class BlogCommentDao extends \App\Db\AbstractBaseDao
 {
   /**
    * Constructor
    *
    * @param string  $connectionname    Database ConnectionName
    */
-  public function __construct(string $connectionName)
+  public function __construct(string $connectionName='')
   {
     parent::__construct($connectionName);
     $this->setTable('blog_comments');
+    $this->setCacheTTL(60);
   }
 
   /**
@@ -43,7 +40,10 @@ class BlogCommentDao extends AbstractBaseDao
    */
   function makeEntity(array $fields=[]): AbstractBaseEntity
   {
-    return new \App\Db\BlogComment(array_change_key_case($fields),CASE_LOWER);
+    $item = new \App\Db\BlogComment(array_change_key_case($fields),CASE_LOWER);
+    $this->cacheSetItem($item);
+
+    return $item;
   }
 
   /**
@@ -53,74 +53,20 @@ class BlogCommentDao extends AbstractBaseDao
    */
   public function fetchAll(): array
   {
-    return
+    if ($items = $this->cacheGetAll()) return $items;
+
+    $items =
       $this->fetchCustom(
         'SELECT * FROM {table}'
       );
+
+    if ($items) $this->cacheSetAll($items);
+
+    return $items;
   }
 
   /**
-   * Fetch record by Id
-   *
-   * @param  int $id                    The id
-   * @return array|null
-   */
-  public function fetchById(int $id)
-  {
-    return
-      $this->fetchCustom(
-        'SELECT * FROM {table} WHERE id = :ID',
-        [':ID' => $id]
-      )[0] ?? null;
-  }
-
-  /**
-   * Fetch record by uuid
-   *
-   * @param  string $uuid               The uuid
-   * @return array|null
-   */
-  public function fetchByUuid(string $uuid)
-  {
-    return
-      $this->fetchCustom(
-        'SELECT * FROM {table} WHERE uuid = :UUID',
-        [':UUID' => $uuid]
-      )[0] ?? null;
-  }
-
-  /**
-   * Get records by article_id
-   *
-   * @param  string $article_id          The article_id
-   * @return array
-   */
-  public function fetchByArticleId(string $article_id)
-  {
-    return
-      $this->fetchCustom(
-        'SELECT * FROM {table} WHERE article_id = :ARTICLE_ID',
-        [':ARTICLE_ID' => $article_id]
-      );
-  }
-
-  /**
-   * Get records by account_id
-   *
-   * @param  string $account_id          The Account_id
-   * @return array
-   */
-  public function fetchByAccountId(string $account_id)
-  {
-    return
-      $this->fetchCustom(
-        'SELECT * FROM {table} WHERE account_id = :ACCOUNT_ID',
-        [':ACCOUNT_ID' => $account_id]
-      );
-  }
-
-  /**
-   * Fetch records by Keyword
+   * Fetch records by Keywords
    *
    * @param  array $keywords            Array with keyword = value
    * @return array
@@ -132,29 +78,44 @@ class BlogCommentDao extends AbstractBaseDao
     $limit = '';
     $binds = [];
 
-    if (!empty($keywords['id'])) {
-       $where .= 'AND (id = :ID) ';
-       $binds[':ID'] = $keywords['id'];
+    if (isset($keywords['id']) && strlen($keywords['id'])>0) {
+      $where .= 'AND (id = :ID) ';
+      $binds[':ID'] = $keywords['id'];
     }
 
-    if (!empty($keywords['uuid'])) {
-       $where .= 'AND (uuid = :UUID) ';
-       $binds[':UUID'] = $keywords['uuid'];
+    if (isset($keywords['created_dt']) && strlen($keywords['created_dt'])>0) {
+      $where .= 'AND (created_dt = :CREATED_DT) ';
+      $binds[':CREATED_DT'] = $keywords['created_dt'];
     }
 
-    if (!empty($keywords['article_id'])) {
-       $where .= 'AND (article_id = :ARTICLE_ID) ';
-       $binds[':ARTICLE_ID'] = $keywords['article_id'];
+    if (isset($keywords['modified_dt']) && strlen($keywords['modified_dt'])>0) {
+      $where .= 'AND (modified_dt = :MODIFIED_DT) ';
+      $binds[':MODIFIED_DT'] = $keywords['modified_dt'];
     }
 
-    if (!empty($keywords['account_id'])) {
-       $where .= 'AND (account_id = :ACCOUNT_ID) ';
-       $binds[':ACCOUNT_ID'] = $keywords['account_id'];
+    if (isset($keywords['uuid']) && strlen($keywords['uuid'])>0) {
+      $where .= 'AND (uuid LIKE :UUID) ';
+      $binds[':UUID'] = $keywords['uuid'];
     }
 
-    if (!empty($keywords['search'])) {
-      $where .= 'AND (comment LIKE :Q1) ';
-      $binds[':Q1'] = $keywords['search'];
+    if (isset($keywords['article_id']) && strlen($keywords['article_id'])>0) {
+      $where .= 'AND (article_id = :ARTICLE_ID) ';
+      $binds[':ARTICLE_ID'] = $keywords['article_id'];
+    }
+
+    if (isset($keywords['account_id']) && strlen($keywords['account_id'])>0) {
+      $where .= 'AND (account_id = :ACCOUNT_ID) ';
+      $binds[':ACCOUNT_ID'] = $keywords['account_id'];
+    }
+
+    if (isset($keywords['comment']) && strlen($keywords['comment'])>0) {
+      $where .= 'AND (comment LIKE :COMMENT) ';
+      $binds[':COMMENT'] = $keywords['comment'];
+    }
+
+    if (isset($keywords['status']) && strlen($keywords['status'])>0) {
+      $where .= 'AND (status = :STATUS) ';
+      $binds[':STATUS'] = $keywords['status'];
     }
 
     if (!empty($where))
@@ -182,10 +143,10 @@ class BlogCommentDao extends AbstractBaseDao
   /**
    * Insert $item into database
    *
-   * @param  \App\Db\AbstractBaseEntity $item      The item we are inserting
+   * @param  AbstractBaseEntity $item      The item we are inserting
    * @return bool
    */
-  public function insert(\App\Db\AbstractBaseEntity &$item): bool
+  public function insert(AbstractBaseEntity &$item): bool
   {
     $id =
       $this->execCustomGetLastId(
@@ -207,18 +168,20 @@ class BlogCommentDao extends AbstractBaseDao
 
     $item->setId($id);
 
+    $this->cacheSetItem($item);
+
     return ($id !=0);
   }
 
   /**
    * Update $item in database
    *
-   * @param  \App\Db\AbstractBaseEntity $item      The item we are updating
+   * @param  AbstractBaseEntity $item      The item we are updating
    * @return bool
    */
-  public function update(\App\Db\AbstractBaseEntity $item): bool
+  public function update(AbstractBaseEntity $item): bool
   {
-    return
+    $ok =
       $this->execCustom(
         'UPDATE {table} SET '.
         ' created_dt = :CREATED_DT, '.
@@ -241,6 +204,10 @@ class BlogCommentDao extends AbstractBaseDao
           ':ID' => $item->getId()
         ]
       );
+
+    if ($ok) $this->cacheSetItem($item);
+
+    return $ok;
   }
 
 } // EOC

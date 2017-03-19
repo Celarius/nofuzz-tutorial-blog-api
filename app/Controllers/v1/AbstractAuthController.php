@@ -20,10 +20,12 @@ class AbstractAuthController extends \Nofuzz\Controller
   protected $jwt;       // JWToken payload
   protected $account;   // The account sending the request
 
-  /**
-   * All requests pass through here
+ /**
+   * Initialize Controller
+   *
+   * @param  array  $args    Path variables as key=value array
    */
-  public function handle(array $args)
+  public function initialize(array $args)
   {
     # Get the JWT Payload
     $this->jwt = app()->container('jwt:payload');
@@ -37,18 +39,18 @@ class AbstractAuthController extends \Nofuzz\Controller
     }
 
     # Fetch the associated account (should exist, unless we deleted it since issuing JWT)
-    $account = (new \App\Db\BlogAccountDao('blog_db'))->fetchByUuid($this->jwt->uuid);
+    $account = (new \App\Db\BlogAccountDao())->fetchBy('uuid',$this->jwt->uuid);
     if ($account) {
       $this->account = $account;
 
-      return parent::handle($args);
+      return parent::initialize($args);
 
     } else {
       response()
-        ->errorJson(401,'','Invalid credentials. Token.uuid account not found');
+        ->errorJson(401,'','Invalid credentials. Token.uuid not found');
     }
 
-    return true;
+    return parent::initialize($args);
   }
 
 }

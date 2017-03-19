@@ -21,13 +21,6 @@ class RequestIdBeforeMiddleware extends \Nofuzz\Middleware
     # Set requestId dependancy
     app()->container('requestId', md5(microtime(true)));
 
-    # Set anonymous func
-    app()->container('func.random',
-      function () {
-        return mt_rand();
-      }
-    );
-
     return true;
   }
 

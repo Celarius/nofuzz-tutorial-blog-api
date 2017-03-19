@@ -4,35 +4,32 @@
  *
  *    Dao class for table blog_accounts
  *
- *  Generated with DaoGen v0.4.3
+ *  Generated with DaoGen v0.4.8
  *
- * @since    2017-03-10 19:24:29
+ * @since    2017-03-18 21:42:54
  * @package  App\Db
  */
 #########################################################################################
 
-Use \App\Db\AbstractBaseDao as AbstractBaseDao;
-Use \App\Db\AbstractBaseEntity as AbstractBaseEntity;
+Use App\Db\AbstractBaseEntity as AbstractBaseEntity;
 
 namespace App\Db;
 
 /**
  * Dao class for rows in table "blog_accounts"
- *
- * @uses     \App\Db\AbstractBaseDao
- * @uses     \App\Db\AbstractBaseEntity
  */
-class BlogAccountDao extends AbstractBaseDao
+class BlogAccountDao extends \App\Db\AbstractBaseDao
 {
   /**
    * Constructor
    *
    * @param string  $connectionname    Database ConnectionName
    */
-  public function __construct(string $connectionName)
+  public function __construct(string $connectionName='')
   {
     parent::__construct($connectionName);
     $this->setTable('blog_accounts');
+    $this->setCacheTTL(60);
   }
 
   /**
@@ -43,7 +40,10 @@ class BlogAccountDao extends AbstractBaseDao
    */
   function makeEntity(array $fields=[]): AbstractBaseEntity
   {
-    return new \App\Db\BlogAccount(array_change_key_case($fields),CASE_LOWER);
+    $item = new \App\Db\BlogAccount(array_change_key_case($fields),CASE_LOWER);
+    $this->cacheSetItem($item);
+
+    return $item;
   }
 
   /**
@@ -53,74 +53,20 @@ class BlogAccountDao extends AbstractBaseDao
    */
   public function fetchAll(): array
   {
-    return
+    if ($items = $this->cacheGetAll()) return $items;
+
+    $items =
       $this->fetchCustom(
         'SELECT * FROM {table}'
       );
+
+    if ($items) $this->cacheSetAll($items);
+
+    return $items;
   }
 
   /**
-   * Fetch record by Id
-   *
-   * @param  int $id                    The id
-   * @return array|null
-   */
-  public function fetchById(int $id)
-  {
-    return
-      $this->fetchCustom(
-        'SELECT * FROM {table} WHERE id = :ID',
-        [':ID' => $id]
-      )[0] ?? null;
-  }
-
-  /**
-   * Fetch record by uuid
-   *
-   * @param  string $uuid               The uuid
-   * @return array|null
-   */
-  public function fetchByUuid(string $uuid)
-  {
-    return
-      $this->fetchCustom(
-        'SELECT * FROM {table} WHERE uuid = :UUID',
-        [':UUID' => $uuid]
-      )[0] ?? null;
-  }
-
-  /**
-   * Get record by login_name
-   *
-   * @param  string $loginName    The Login Name
-   * @return array
-   */
-  public function fetchByLoginName(string $loginName)
-  {
-    return
-      $this->fetchCustom(
-        'SELECT * FROM {table} WHERE login_name = :LOGIN_NAME',
-        [':LOGIN_NAME' => $loginName]
-      )[0] ?? null;
-  }
-
-  /**
-   * Get record by email_name
-   *
-   * @param  string $loginName    The Login Name
-   * @return array
-   */
-  public function fetchByEmail(string $email)
-  {
-    return
-      $this->fetchCustom(
-        'SELECT * FROM {table} WHERE email = :EMAIL',
-        [':EMAIL' => $email]
-      )[0] ?? null;
-  }
-
-  /**
-   * Fetch records by Keyword
+   * Fetch records by Keywords
    *
    * @param  array $keywords            Array with keyword = value
    * @return array
@@ -132,22 +78,69 @@ class BlogAccountDao extends AbstractBaseDao
     $limit = '';
     $binds = [];
 
-    if (!empty($keywords['id'])) {
-       $where .= 'AND (id = :ID) ';
-       $binds[':ID'] = $keywords['id'];
+    if (isset($keywords['id']) && strlen($keywords['id'])>0) {
+      $where .= 'AND (id = :ID) ';
+      $binds[':ID'] = $keywords['id'];
     }
 
-    if (!empty($keywords['uuid'])) {
-       $where .= 'AND (uuid = :UUID) ';
-       $binds[':UUID'] = $keywords['uuid'];
+    if (isset($keywords['created_dt']) && strlen($keywords['created_dt'])>0) {
+      $where .= 'AND (created_dt = :CREATED_DT) ';
+      $binds[':CREATED_DT'] = $keywords['created_dt'];
     }
 
-    if (!empty($keywords['name'])) {
-      $where .= 'AND (login_name LIKE :Q1 or first_name LIKE :Q2 OR last_name LIKE :Q3 or email LIKE :Q4) ';
-      $binds[':Q1'] = $keywords['q'];
-      $binds[':Q2'] = $keywords['q'];
-      $binds[':Q3'] = $keywords['q'];
-      $binds[':Q4'] = $keywords['q'];
+    if (isset($keywords['modified_dt']) && strlen($keywords['modified_dt'])>0) {
+      $where .= 'AND (modified_dt = :MODIFIED_DT) ';
+      $binds[':MODIFIED_DT'] = $keywords['modified_dt'];
+    }
+
+    if (isset($keywords['uuid']) && strlen($keywords['uuid'])>0) {
+      $where .= 'AND (uuid LIKE :UUID) ';
+      $binds[':UUID'] = $keywords['uuid'];
+    }
+
+    if (isset($keywords['login_name']) && strlen($keywords['login_name'])>0) {
+      $where .= 'AND (login_name LIKE :LOGIN_NAME) ';
+      $binds[':LOGIN_NAME'] = $keywords['login_name'];
+    }
+
+    if (isset($keywords['first_name']) && strlen($keywords['first_name'])>0) {
+      $where .= 'AND (first_name LIKE :FIRST_NAME) ';
+      $binds[':FIRST_NAME'] = $keywords['first_name'];
+    }
+
+    if (isset($keywords['last_name']) && strlen($keywords['last_name'])>0) {
+      $where .= 'AND (last_name LIKE :LAST_NAME) ';
+      $binds[':LAST_NAME'] = $keywords['last_name'];
+    }
+
+    if (isset($keywords['email']) && strlen($keywords['email'])>0) {
+      $where .= 'AND (email LIKE :EMAIL) ';
+      $binds[':EMAIL'] = $keywords['email'];
+    }
+
+    if (isset($keywords['jwt_secret']) && strlen($keywords['jwt_secret'])>0) {
+      $where .= 'AND (jwt_secret LIKE :JWT_SECRET) ';
+      $binds[':JWT_SECRET'] = $keywords['jwt_secret'];
+    }
+
+    if (isset($keywords['pw_salt']) && strlen($keywords['pw_salt'])>0) {
+      $where .= 'AND (pw_salt LIKE :PW_SALT) ';
+      $binds[':PW_SALT'] = $keywords['pw_salt'];
+    }
+
+    if (isset($keywords['pw_hash']) && strlen($keywords['pw_hash'])>0) {
+      $where .= 'AND (pw_hash LIKE :PW_HASH) ';
+      $binds[':PW_HASH'] = $keywords['pw_hash'];
+    }
+
+    if (isset($keywords['pw_iterations']) && strlen($keywords['pw_iterations'])>0) {
+      $where .= 'AND (pw_iterations = :PW_ITERATIONS) ';
+      $binds[':PW_ITERATIONS'] = $keywords['pw_iterations'];
+    }
+
+    if (isset($keywords['status']) && strlen($keywords['status'])>0) {
+      $where .= 'AND (status = :STATUS) ';
+      $binds[':STATUS'] = $keywords['status'];
     }
 
     if (!empty($where))
@@ -175,10 +168,10 @@ class BlogAccountDao extends AbstractBaseDao
   /**
    * Insert $item into database
    *
-   * @param  \App\Db\AbstractBaseEntity $item      The item we are inserting
+   * @param  AbstractBaseEntity $item      The item we are inserting
    * @return bool
    */
-  public function insert(\App\Db\AbstractBaseEntity &$item): bool
+  public function insert(AbstractBaseEntity &$item): bool
   {
     $id =
       $this->execCustomGetLastId(
@@ -205,18 +198,20 @@ class BlogAccountDao extends AbstractBaseDao
 
     $item->setId($id);
 
+    $this->cacheSetItem($item);
+
     return ($id !=0);
   }
 
   /**
    * Update $item in database
    *
-   * @param  \App\Db\AbstractBaseEntity $item      The item we are updating
+   * @param  AbstractBaseEntity $item      The item we are updating
    * @return bool
    */
-  public function update(\App\Db\AbstractBaseEntity $item): bool
+  public function update(AbstractBaseEntity $item): bool
   {
-    return
+    $ok =
       $this->execCustom(
         'UPDATE {table} SET '.
         ' created_dt = :CREATED_DT, '.
@@ -249,6 +244,10 @@ class BlogAccountDao extends AbstractBaseDao
           ':ID' => $item->getId()
         ]
       );
+
+    if ($ok) $this->cacheSetItem($item);
+
+    return $ok;
   }
 
 } // EOC

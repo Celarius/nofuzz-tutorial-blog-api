@@ -4,9 +4,6 @@
  *
  *    Controller for table blog_accounts
  *
- *  Generated with DaoGen v0.4.3
- *
- * @since    2017-03-10 19:24:29
  * @package  Nofuzz Appliction
  */
 #########################################################################################
@@ -32,7 +29,7 @@ JSON Model:
 
 namespace App\Controllers\v1;
 
-class BlogAccountController extends \Nofuzz\Controller
+class BlogAccountController extends \App\Controllers\v1\AbstractAuthController
 {
   /**
    * Handle GET requests
@@ -44,9 +41,10 @@ class BlogAccountController extends \Nofuzz\Controller
     $parUuid = $args['uuid'] ?? null;   // Get path provided {uuid}
 
     if (!empty($parUuid)) {
-      $items = (new \App\Db\BlogAccountDao('blog_db'))->fetchByUuid($parUuid);
+      $item = (new \App\Db\BlogAccountDao())->fetchBy('uuid',$parUuid);
+      if ($item) $items[]=$item;
     } else {
-      $items = (new \App\Db\BlogAccountDao('blog_db'))->fetchAll();
+      $items = (new \App\Db\BlogAccountDao())->fetchAll();
     }
 
     $data = [];
@@ -90,7 +88,7 @@ class BlogAccountController extends \Nofuzz\Controller
 
         return true;
     } else {
-      $acc = (new \App\Db\BlogAccountDao('blog_db'))->fetchByLoginName($body['login_name']);
+      $acc = (new \App\Db\BlogAccountDao())->fetchBy('login_name',$body['login_name']);
       if ($acc) {
         response()
           ->errorJson(400,'','Account already exists with {login_name}');
@@ -106,7 +104,7 @@ class BlogAccountController extends \Nofuzz\Controller
 
         return true;
     } else {
-      $acc = (new \App\Db\BlogAccountDao('blog_db'))->fetchByEmail($body['email']);
+      $acc = (new \App\Db\BlogAccountDao())->fetchBy('email',$body['email']);
       if ($acc) {
         response()
           ->errorJson(400,'','Account already exists with {email}');
@@ -125,12 +123,12 @@ class BlogAccountController extends \Nofuzz\Controller
 
     # Create new item
     $item = new \App\Db\BlogAccount($body);
-    $item->setUuid( \Nofuzz\Helpers\UUID::generate() );
-    $item->setPwSalt( \Nofuzz\Helpers\Hash::generate($item->getUuid()) );
-    $item->setPwHash( \Nofuzz\Helpers\Hash::generate($item->getUuid().$body['password']) );
+    $item->setUuid( \Nofuzz\Helpers\Uuid::v4() );
+    $item->setPwSalt( \Nofuzz\Helpers\Hash::v4($item->getUuid()) );
+    $item->setPwHash( \Nofuzz\Helpers\Hash::v4($item->getPwSalt().$body['password']) );
 
     # Insert into DB
-    $ok = (new \App\Db\BlogAccountDao('blog_db'))->insert($item);
+    $ok = (new \App\Db\BlogAccountDao())->insert($item);
 
     if ($ok) {
       # Generate Response
@@ -185,11 +183,11 @@ class BlogAccountController extends \Nofuzz\Controller
     }
 
     # Fetch the Account based on UUID
-    $item = (new \App\Db\BlogAccountDao('blog_db'))->fetchByUuid($body['uuid']);
+    $item = (new \App\Db\BlogAccountDao())->fetchBy('uuid',$body['uuid']);
 
     # Check & verify login_name - if present & different
     if (!empty($body['login_name']) && strcasecmp($body['login_name'],$item->getLoginName())!=0 ) {
-      $acc = (new \App\Db\BlogAccountDao('blog_db'))->fetchByLoginName($body['login_name']);
+      $acc = (new \App\Db\BlogAccountDao())->fetchBy('login_name',$body['login_name']);
       if ($acc) {
         response()
           ->errorJson(400,'','Account already exists with {login_name}');
@@ -200,7 +198,7 @@ class BlogAccountController extends \Nofuzz\Controller
 
     # Check & verify email - if present
     if (!empty($body['email']) && strcasecmp($body['email'],$item->getEmail())!=0 ) {
-      $acc = (new \App\Db\BlogAccountDao('blog_db'))->fetchByEmail($body['email']);
+      $acc = (new \App\Db\BlogAccountDao())->fetchBy('email',$body['email']);
       if ($acc) {
         response()
           ->errorJson(400,'','Account already exists with {email}');
@@ -210,16 +208,17 @@ class BlogAccountController extends \Nofuzz\Controller
     }
 
     # Update the fields
-    if (!empty($body['login_name'])) $item->setLoginName($body['login_name']);
-    if (!empty($body['first_name'])) $item->setFirstName($body['first_name']);
-    if (!empty($body['last_name'])) $item->setLastName($body['last_name']);
-    if (!empty($body['email'])) $item->setEMail($body['email']);
-    if (!empty($body['password'])) {
+    $item->setModifiedDt((new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    if (isset($body['login_name'])) $item->setLoginName($body['login_name']);
+    if (isset($body['first_name'])) $item->setFirstName($body['first_name']);
+    if (isset($body['last_name'])) $item->setLastName($body['last_name']);
+    if (isset($body['email'])) $item->setEMail($body['email']);
+    if (isset($body['password'])) {
       $item->setPwSalt( \Nofuzz\Helpers\Hash::generate($item->getUuid()) );
-      $item->setPwHash( \Nofuzz\Helpers\Hash::generate($item->getUuid().$body['password']) );
+      $item->setPwHash( \Nofuzz\Helpers\Hash::generate($item->getPwSalt().$body['password']) );
     }
 
-    $ok = (new \App\Db\BlogAccountDao('blog_db'))->update($item);
+    $ok = (new \App\Db\BlogAccountDao())->update($item);
 
     # Update into DB
     if ($ok) {
@@ -252,10 +251,10 @@ class BlogAccountController extends \Nofuzz\Controller
 
     $parUuid = $args['uuid'];
 
-    $item = (new \App\Db\BlogAccountDao('blog_db'))->fetchByUuid($parUuid);
+    $item = (new \App\Db\BlogAccountDao())->fetchBy('uuid',$parUuid);
 
     if ($item) {
-      $ok = (new \App\Db\BlogAccountDao('blog_db'))->delete($item);
+      $ok = (new \App\Db\BlogAccountDao())->delete($item);
     }
 
     response()

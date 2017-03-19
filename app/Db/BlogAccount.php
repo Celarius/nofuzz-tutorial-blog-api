@@ -4,9 +4,9 @@
  *
  *    Entity for table blog_accounts
  *
- *  Generated with DaoGen v0.4.3
+ *  Generated with DaoGen v0.4.8
  *
- * @since    2017-03-10 19:24:29
+ * @since    2017-03-18 21:42:54
  * @package  Nofuzz Appliction
  */
 #########################################################################################
@@ -30,20 +30,16 @@ JSON Model:
 */
 #########################################################################################
 
-Use \App\Db\AbstractBaseEntity as AbstractBaseEntity;
-
 namespace App\Db;
 
 /** 
  * Class representing rows in table "blog_accounts"
- * 
- * @uses     \App\Db\AbstractBaseEntity
  */
-class BlogAccount extends AbstractBaseEntity
+class BlogAccount extends \App\Db\AbstractBaseEntity
 {
   protected $id;                                // id BigInt(20) NOT NULL AUTO_INCREMENT
-  protected $created_dt;                        // created_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-  protected $modified_dt;                       // modified_dt Timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  protected $created_dt;                        // created_dt DateTime
+  protected $modified_dt;                       // modified_dt DateTime
   protected $uuid;                              // uuid NVarChar(64) COLLATE utf8_general_ci
   protected $login_name;                        // login_name NVarChar(32) COLLATE utf8_general_ci
   protected $first_name;                        // first_name NVarChar(32) COLLATE utf8_general_ci
@@ -129,42 +125,57 @@ class BlogAccount extends AbstractBaseEntity
 
   public function getId()
   {
+    if (!is_null($this->id)) return (int) $this->id;
+
     return $this->id;
   }
 
   public function setId($id)
   {
-    $this->id = (int) $id;
+    $this->id = $id;
 
     return $this;
   }
 
   public function getCreatedDt()
   {
+
     return $this->created_dt;
   }
 
   public function setCreatedDt($created_dt)
   {
-    $this->created_dt = (new \DateTime($created_dt,new \DateTimeZone("UTC")))->format("Y-m-d H:i:s");
+    if (strcasecmp($created_dt,'0000-00-00 00:00:00')==0) $created_dt = null;
+
+    $this->created_dt = $created_dt;
+
+    if (!is_null($created_dt))
+      $this->created_dt = (new \DateTime($created_dt,new \DateTimeZone("UTC")))->format("Y-m-d H:i:s");
 
     return $this;
   }
 
   public function getModifiedDt()
   {
+
     return $this->modified_dt;
   }
 
   public function setModifiedDt($modified_dt)
   {
-    $this->modified_dt = (new \DateTime($modified_dt,new \DateTimeZone("UTC")))->format("Y-m-d H:i:s");
+    if (strcasecmp($modified_dt,'0000-00-00 00:00:00')==0) $modified_dt = null;
+
+    $this->modified_dt = $modified_dt;
+
+    if (!is_null($modified_dt))
+      $this->modified_dt = (new \DateTime($modified_dt,new \DateTimeZone("UTC")))->format("Y-m-d H:i:s");
 
     return $this;
   }
 
   public function getUuid()
   {
+
     return $this->uuid;
   }
 
@@ -177,6 +188,7 @@ class BlogAccount extends AbstractBaseEntity
 
   public function getLoginName()
   {
+
     return $this->login_name;
   }
 
@@ -189,6 +201,7 @@ class BlogAccount extends AbstractBaseEntity
 
   public function getFirstName()
   {
+
     return $this->first_name;
   }
 
@@ -201,6 +214,7 @@ class BlogAccount extends AbstractBaseEntity
 
   public function getLastName()
   {
+
     return $this->last_name;
   }
 
@@ -213,6 +227,7 @@ class BlogAccount extends AbstractBaseEntity
 
   public function getEmail()
   {
+
     return $this->email;
   }
 
@@ -225,6 +240,7 @@ class BlogAccount extends AbstractBaseEntity
 
   public function getJwtSecret()
   {
+
     return $this->jwt_secret;
   }
 
@@ -237,6 +253,7 @@ class BlogAccount extends AbstractBaseEntity
 
   public function getPwSalt()
   {
+
     return $this->pw_salt;
   }
 
@@ -249,6 +266,7 @@ class BlogAccount extends AbstractBaseEntity
 
   public function getPwHash()
   {
+
     return $this->pw_hash;
   }
 
@@ -261,24 +279,28 @@ class BlogAccount extends AbstractBaseEntity
 
   public function getPwIterations()
   {
+    if (!is_null($this->pw_iterations)) return (int) $this->pw_iterations;
+
     return $this->pw_iterations;
   }
 
   public function setPwIterations($pw_iterations)
   {
-    $this->pw_iterations = (int) $pw_iterations;
+    $this->pw_iterations = $pw_iterations;
 
     return $this;
   }
 
   public function getStatus()
   {
+    if (!is_null($this->status)) return (int) $this->status;
+
     return $this->status;
   }
 
   public function setStatus($status)
   {
-    $this->status = (int) $status;
+    $this->status = $status;
 
     return $this;
   }

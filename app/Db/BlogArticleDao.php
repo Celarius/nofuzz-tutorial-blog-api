@@ -4,35 +4,32 @@
  *
  *    Dao class for table blog_articles
  *
- *  Generated with DaoGen v0.4.3
+ *  Generated with DaoGen v0.4.8
  *
- * @since    2017-03-10 19:24:29
+ * @since    2017-03-18 21:42:54
  * @package  App\Db
  */
 #########################################################################################
 
-Use \App\Db\AbstractBaseDao as AbstractBaseDao;
-Use \App\Db\AbstractBaseEntity as AbstractBaseEntity;
+Use App\Db\AbstractBaseEntity as AbstractBaseEntity;
 
 namespace App\Db;
 
 /**
  * Dao class for rows in table "blog_articles"
- *
- * @uses     \App\Db\AbstractBaseDao
- * @uses     \App\Db\AbstractBaseEntity
  */
-class BlogArticleDao extends AbstractBaseDao
+class BlogArticleDao extends \App\Db\AbstractBaseDao
 {
   /**
    * Constructor
    *
    * @param string  $connectionname    Database ConnectionName
    */
-  public function __construct(string $connectionName)
+  public function __construct(string $connectionName='')
   {
     parent::__construct($connectionName);
     $this->setTable('blog_articles');
+    $this->setCacheTTL(60);
   }
 
   /**
@@ -43,7 +40,10 @@ class BlogArticleDao extends AbstractBaseDao
    */
   function makeEntity(array $fields=[]): AbstractBaseEntity
   {
-    return new \App\Db\BlogArticle(array_change_key_case($fields),CASE_LOWER);
+    $item = new \App\Db\BlogArticle(array_change_key_case($fields),CASE_LOWER);
+    $this->cacheSetItem($item);
+
+    return $item;
   }
 
   /**
@@ -53,59 +53,20 @@ class BlogArticleDao extends AbstractBaseDao
    */
   public function fetchAll(): array
   {
-    return
+    if ($items = $this->cacheGetAll()) return $items;
+
+    $items =
       $this->fetchCustom(
         'SELECT * FROM {table}'
       );
+
+    if ($items) $this->cacheSetAll($items);
+
+    return $items;
   }
 
   /**
-   * Fetch record by Id
-   *
-   * @param  int $id                    The id
-   * @return array|null
-   */
-  public function fetchById(int $id)
-  {
-    return
-      $this->fetchCustom(
-        'SELECT * FROM {table} WHERE id = :ID',
-        [':ID' => $id]
-      )[0] ?? null;
-  }
-
-  /**
-   * Fetch record by uuid
-   *
-   * @param  string $uuid               The uuid
-   * @return array|null
-   */
-  public function fetchByUuid(string $uuid)
-  {
-    return
-      $this->fetchCustom(
-        'SELECT * FROM {table} WHERE uuid = :UUID',
-        [':UUID' => $uuid]
-      )[0] ?? null;
-  }
-
-  /**
-   * Get record by title
-   *
-   * @param  string $title          The title
-   * @return array
-   */
-  public function fetchByTitle(string $title)
-  {
-    return
-      $this->fetchCustom(
-        'SELECT * FROM {table} WHERE LOWER(title) = :TITLE',
-        [':TITLE' => strtolower($title)]
-      )[0] ?? null;
-  }
-
-  /**
-   * Fetch records by Keyword
+   * Fetch records by Keywords
    *
    * @param  array $keywords            Array with keyword = value
    * @return array
@@ -117,20 +78,44 @@ class BlogArticleDao extends AbstractBaseDao
     $limit = '';
     $binds = [];
 
-    if (!empty($keywords['id'])) {
-       $where .= 'AND (id = :ID) ';
-       $binds[':ID'] = $keywords['id'];
+    if (isset($keywords['id']) && strlen($keywords['id'])>0) {
+      $where .= 'AND (id = :ID) ';
+      $binds[':ID'] = $keywords['id'];
     }
 
-    if (!empty($keywords['uuid'])) {
-       $where .= 'AND (uuid = :UUID) ';
-       $binds[':UUID'] = $keywords['uuid'];
+    if (isset($keywords['created_dt']) && strlen($keywords['created_dt'])>0) {
+      $where .= 'AND (created_dt = :CREATED_DT) ';
+      $binds[':CREATED_DT'] = $keywords['created_dt'];
     }
 
-    if (!empty($keywords['search'])) {
-      $where .= 'AND (title LIKE :Q1 OR body LIKE :Q2) ';
-      $binds[':Q1'] = $keywords['search'];
-      $binds[':Q2'] = $keywords['search'];
+    if (isset($keywords['modified_dt']) && strlen($keywords['modified_dt'])>0) {
+      $where .= 'AND (modified_dt = :MODIFIED_DT) ';
+      $binds[':MODIFIED_DT'] = $keywords['modified_dt'];
+    }
+
+    if (isset($keywords['uuid']) && strlen($keywords['uuid'])>0) {
+      $where .= 'AND (uuid LIKE :UUID) ';
+      $binds[':UUID'] = $keywords['uuid'];
+    }
+
+    if (isset($keywords['blog_id']) && strlen($keywords['blog_id'])>0) {
+      $where .= 'AND (blog_id = :BLOG_ID) ';
+      $binds[':BLOG_ID'] = $keywords['blog_id'];
+    }
+
+    if (isset($keywords['title']) && strlen($keywords['title'])>0) {
+      $where .= 'AND (title LIKE :TITLE) ';
+      $binds[':TITLE'] = $keywords['title'];
+    }
+
+    if (isset($keywords['body']) && strlen($keywords['body'])>0) {
+      $where .= 'AND (body LIKE :BODY) ';
+      $binds[':BODY'] = $keywords['body'];
+    }
+
+    if (isset($keywords['status']) && strlen($keywords['status'])>0) {
+      $where .= 'AND (status = :STATUS) ';
+      $binds[':STATUS'] = $keywords['status'];
     }
 
     if (!empty($where))
@@ -158,10 +143,10 @@ class BlogArticleDao extends AbstractBaseDao
   /**
    * Insert $item into database
    *
-   * @param  \App\Db\AbstractBaseEntity $item      The item we are inserting
+   * @param  AbstractBaseEntity $item      The item we are inserting
    * @return bool
    */
-  public function insert(\App\Db\AbstractBaseEntity &$item): bool
+  public function insert(AbstractBaseEntity &$item): bool
   {
     $id =
       $this->execCustomGetLastId(
@@ -183,18 +168,20 @@ class BlogArticleDao extends AbstractBaseDao
 
     $item->setId($id);
 
+    $this->cacheSetItem($item);
+
     return ($id !=0);
   }
 
   /**
    * Update $item in database
    *
-   * @param  \App\Db\AbstractBaseEntity $item      The item we are updating
+   * @param  AbstractBaseEntity $item      The item we are updating
    * @return bool
    */
-  public function update(\App\Db\AbstractBaseEntity $item): bool
+  public function update(AbstractBaseEntity $item): bool
   {
-    return
+    $ok =
       $this->execCustom(
         'UPDATE {table} SET '.
         ' created_dt = :CREATED_DT, '.
@@ -217,6 +204,10 @@ class BlogArticleDao extends AbstractBaseDao
           ':ID' => $item->getId()
         ]
       );
+
+    if ($ok) $this->cacheSetItem($item);
+
+    return $ok;
   }
 
 } // EOC

@@ -58,7 +58,6 @@ class AuthHttpBeforeMiddleware extends \Nofuzz\Middleware
 
     } else {
       # Unknown authentication method
-      $type = 'Basic'; // default method. Change as needed
       response()
         ->setStatusCode(403);
     }

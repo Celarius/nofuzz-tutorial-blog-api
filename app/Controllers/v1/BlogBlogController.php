@@ -4,9 +4,6 @@
  *
  *    Controller for table blog_blogs
  *
- *  Generated with DaoGen v0.4.3
- *
- * @since    2017-03-10 19:24:29
  * @package  Nofuzz Appliction
  */
 #########################################################################################
@@ -27,18 +24,8 @@ JSON Model:
 
 namespace App\Controllers\v1;
 
-class BlogBlogController extends \Nofuzz\Controller
+class BlogBlogController extends \App\Controllers\v1\AbstractAuthController
 {
- /**
-   * Initialize Controller
-   *
-   * @param  array  $args    Path variables as key=value array
-   */
-  public function initialize(array $args)
-  {
-    return parent::initialize($args);
-  }
-
   /**
    * Handle GET requests
    *
@@ -49,9 +36,10 @@ class BlogBlogController extends \Nofuzz\Controller
     $parUuid = $args['uuid'];
 
     if (!empty($parUuid)) {
-      $items = (new \App\Db\BlogBlogDao('blog_db'))->fetchByUuid($parUuid);
+      $item = (new \App\Db\BlogBlogDao())->fetchBy('uuid',$parUuid);
+      if ($item) $items[]=$item;
     } else {
-      $items = (new \App\Db\BlogBlogDao('blog_db'))->fetchAll();
+      $items = (new \App\Db\BlogBlogDao())->fetchAll();
     }
 
     $data = [];
@@ -67,6 +55,18 @@ class BlogBlogController extends \Nofuzz\Controller
 
   /**
    * Handle POST requests
+   *
+   *   Inserts a new Blog into the database
+   *
+   *   Model fields used:
+   *     Title
+   *     Description
+   *     Status
+   *
+   *   Checks performed:
+   *   1.  Validate HTTP Header Content-Type
+   *   2.  Validate Body as valid JSON
+   *   3.  Validate Title is not empty
    *
    * @param  array  $args    Path variables as key=value array
    */
@@ -88,34 +88,31 @@ class BlogBlogController extends \Nofuzz\Controller
       return true;
     }
 
-    # Fetch the users account
-    $jwt = app()->container('jwt:payload');
-    $account = (new \App\Db\BlogAccountDao('blog_db'))->fetchByUuid( $jwt->uuid );
-
-    if (!$account) {
+    # Validate Title is not empty
+    if ( empty($body['title']) ) {
       response()
-        ->errorJson(400,'','Invalid {account}, something is seriously wrong...');
+        ->errorJson(404,'','Blog {title} can not be empty');
 
       return true;
     }
 
+    # Create, Initialize and insert the Item
     $item = new \App\Db\BlogBlog($body);
-    $item->setAccountId( $account->getId() );
+    $item->setCreatedDt((new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    $item->setModifiedDt((new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    $item->setAccountId( $this->account->getId() );
     $item->setUuid( \Nofuzz\Helpers\UUID::generate() );
-
-    $ok = (new \App\Db\BlogBlogDao('blog_db'))->insert($item);
+    $ok = (new \App\Db\BlogBlogDao())->insert($item);
 
     if ($ok) {
-      # Generate Response
       response()
         ->setCacheControl('private, no-cache, no-store')
         ->setStatusCode( 200 )
         ->setJsonBody( $item->asArray() );
 
     } else {
-      # Generate Response
       response()
-        ->errorJson(500,'','Failed to register account, reason unknown' );
+        ->errorJson(500,'','Operation failed, reason unknown' );
 
     }
 
@@ -125,10 +122,33 @@ class BlogBlogController extends \Nofuzz\Controller
   /**
    * Handle PUT requests
    *
+   *   Updates a Blog item in the database
+   *
+   *   Model fields used:
+   *     Title
+   *     Description
+   *     Status
+   *
+   *   Checks performed:
+   *   1.  Validate HTTP Header Content-Type
+   *   2.  Validate Body as valid JSON
+   *   3.  Validate Blog item with UUID exists
+   *   4.  Validate Blog is owned by Authenticated account
+   *
    * @param  array  $args    Path variables as key=value array
    */
   public function handlePUT(array $args)
   {
+    $parUuid = $args['uuid']; // Blogs's UUID to update
+
+    # Check & verify UUID
+    if (empty($parUuid)) {
+        response()
+          ->errorJson(400,'','Invalid {uuid}');
+
+        return true;
+    }
+
     # Validate HTTP Request "Content-type"
     if (!preg_match('/application\/json/i',(request()->getHeader('Content-Type')[0] ?? ''))) {
       response()
@@ -146,38 +166,11 @@ class BlogBlogController extends \Nofuzz\Controller
       return true;
     }
 
-    # Check & verify UUID
-    if (empty($body['uuid'])) {
-        response()
-          ->errorJson(400,'','Must provide a valid {uuid}');
-
-        return true;
-    }
-
-    # Fetch the users account
-    $jwt = app()->container('jwt:payload');
-    $account = (new \App\Db\BlogAccountDao('blog_db'))->fetchByUuid( $jwt->uuid );
-
-    if (!$account) {
-      response()
-        ->errorJson(400,'','Invalid {account}, something is seriously wrong...');
-
-      return true;
-    }
-
-    # Fetch the Blog Item we are updating account
-    $item = (new \App\Db\BlogBlogDao('blog_db'))->fetchByUuid($body['uuid']);
+    # Fetch the Blog Item we are updating & Check the Blog belongs to the Account
+    $item = (new \App\Db\BlogBlogDao())->fetchByKeywords( ['uuid'=>$parUuid,'account_id'=>$this->account->getId()] );
     if (!$item) {
       response()
-        ->errorJson(404,'','Blog {blog.uuid} not found');
-
-      return true;
-    }
-
-    # Check the Blog belongs to the Account - Output as 404 if not owned by account
-    if ( $item->getAccountId()<>$account->getId() ) {
-      response()
-        ->errorJson(404,'','Blog {blog.uuid} not found');
+        ->errorJson(400,'','Invalid {uuid}');
 
       return true;
     }
@@ -186,20 +179,17 @@ class BlogBlogController extends \Nofuzz\Controller
     $item->setModifiedDt((new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
     if (!empty($body['title'])) $item->setTitle($body['title']);
     if (!empty($body['description'])) $item->setDescription($body['description']);
-
-    $ok = (new \App\Db\BlogBlogDao('blog_db'))->update($item);
+    $ok = (new \App\Db\BlogBlogDao())->update($item);
 
     if ($ok) {
-      # Generate Response
       response()
         ->setCacheControl('private, no-cache, no-store')
         ->setStatusCode( 200 )
         ->setJsonBody( $item->asArray() );
 
     } else {
-      # Generate Response
       response()
-        ->errorJson(500,'','Failed to register account, reason unknown' );
+        ->errorJson(500,'','Operation failed, reason unknown' );
 
     }
 
@@ -209,37 +199,37 @@ class BlogBlogController extends \Nofuzz\Controller
   /**
    * Handle DELETE requests
    *
+   *   Delete a Blog item from the database
+   *
+   *   Checks performed:
+   *   1.  Validate UUID is not empty
+   *   2.  Validate Blog is owned by Authenticated account
+   *
    * @param  array  $args    Path variables as key=value array
    */
   public function handleDELETE(array $args)
   {
     $parUuid = $args['uuid'];
 
-    # Fetch the users account
-    $jwt = app()->container('jwt:payload');
-    $account = (new \App\Db\BlogAccountDao('blog_db'))->fetchByUuid( $jwt->uuid );
-
-    if (!$account) {
+    # Validate UUID is not empty
+    if (empty($parUuid)) {
       response()
-        ->errorJson(400,'','Invalid {account}, something is seriously wrong...');
+        ->errorJson(400,'','Parameter {uuid} is invalid');
 
       return true;
     }
 
-    # Check the Item belongs to the Account - Output as 404 if not owned by account
-    if ( $item->getAccountId()<>$account->getId() ) {
+    # Fetch the Blog
+    $blog = (new \App\Db\BlogBlogDao())->fetchByKeywords(['uuid'=>$parUuid,'account_id'=>$this->account->getId()])[0] ?? null;
+    if ( !$blog ) {
       response()
-        ->errorJson(404,'','Blog {blog.uuid} not found');
+        ->errorJson(404,'','Parameter {uuid} is invalid');
 
       return true;
     }
 
-    # Fetch the Item
-    $item = (new \App\Db\BlogBlogDao('blog_db'))->fetchByUuid($parUuid);
-
-    if ($item) {
-      $ok = (new \App\Db\BlogBlogDao('blog_db'))->delete($item);
-    }
+    # Delete it
+    $ok = (new \App\Db\BlogBlogDao())->delete($blog);
 
     response()
       ->setStatusCode( 204 )

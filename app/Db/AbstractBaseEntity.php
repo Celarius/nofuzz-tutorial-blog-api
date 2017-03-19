@@ -1,8 +1,8 @@
 <?php
 /**
- * Abstract Bae DB Object.php
+ * Abstract Base Entity
  *
- * @package     Nofuzz-blog-tutorial
+ * @package  Nofuzz Appliction
  */
 #########################################################################################
 

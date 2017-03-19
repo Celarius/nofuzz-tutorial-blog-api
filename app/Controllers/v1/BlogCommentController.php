@@ -4,9 +4,9 @@
  *
  *    Controller for table blog_comments
  *
- *  Generated with DaoGen v0.4.3
+ *  Generated with DaoGen v0.4.8
  *
- * @since    2017-03-10 19:24:29
+ * @since    2017-03-18 21:42:54
  * @package  Nofuzz Appliction
  */
 #########################################################################################
@@ -46,15 +46,17 @@ class BlogCommentController extends \Nofuzz\Controller
    */
   public function handleGET(array $args)
   {
-    $parId = $args['id'] ?? null;   // Get path provided {id}
+    $parUuid = $args['uuid'];
 
-    if (!empty($parId)) {
-      $items = (new \App\Db\BlogCommentDao('blog_db'))->fetchById($parId);
+    if (!empty($parUuid)) {
+      $item = (new \App\Db\BlogCommentDao())->fetchBy('uuid',$parUuid);
+      if ($item) $items[] = $item;
     } else {
-      $items = (new \App\Db\BlogCommentDao('blog_db'))->fetchAll();
+      $items = (new \App\Db\BlogCommentDao())->fetchAll();
     }
 
-    $data = [];    foreach ($items as $item) $data[] = $item->asArray();
+    $data = [];    foreach ($items as $item)
+      $data[] = $item->asArray();
     response()
       ->setStatusCode( 200 )
       ->setJsonBody( $data );
@@ -69,6 +71,16 @@ class BlogCommentController extends \Nofuzz\Controller
    */
   public function handlePOST(array $args)
   {
+    $parUuid = $args['uuid']; // Article's UUID to which the comment belongs
+
+    # Check & verify UUID
+    if (empty($parUuid)) {
+        response()
+          ->errorJson(400,'','Invalid {uuid}');
+
+        return true;
+    }
+
     # Validate HTTP Request "Content-type"
     if (!preg_match('/application\/json/i',(request()->getHeader('Content-Type')[0] ?? ''))) {
       response()
@@ -84,15 +96,37 @@ class BlogCommentController extends \Nofuzz\Controller
       return null;
     }
 
+    # Get Article UUID we want to post a comment to
+    $article = (new \App\Db\BlogArticleDao())->fetchBy('uuid',$parUuid);
+
+    if ( $article ) {
+      response()
+        ->errorJson(400,'','Invalid {uuid}');
+
+      return true;
+    }
+
+    # Create new Item, set properties
     $item = new \App\Db\BlogComment($body);
+    $item->setCreatedDt((new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    $item->setModifiedDt((new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    $item->setUuid( \Nofuzz\Helpers\UUID::v4() );
+    $item->setArticleId( $article->getId() );
+    $item->setAccountId( $this->account->getId() );
+    $item->setStatus(0);
+    $ok = (new \App\Db\BlogCommentDao())->insert($item);
 
-    // Should check for existance of $item already in DB and abort if found
+    if ($ok) {
+      response()
+        ->setCacheControl('private, no-cache, no-store')
+        ->setStatusCode( 200 )
+        ->setJsonBody( $item->asArray() );
 
-    $ok = (new \App\Db\BlogCommentDao('blog_db'))->insert($item);
+    } else {
+      response()
+        ->errorJson(500,'','Operation failed, reason unknown' );
 
-    response()
-      ->setStatusCode( 200 )
-      ->setJsonBody( $item->asArray() );
+    }
 
     return true;
   }
@@ -104,6 +138,16 @@ class BlogCommentController extends \Nofuzz\Controller
    */
   public function handlePUT(array $args)
   {
+    $parUuid = $args['uuid']; // Comments's UUID
+
+    # Check & verify UUID
+    if (empty($parUuid)) {
+        response()
+          ->errorJson(400,'','Invalid {uuid}');
+
+        return true;
+    }
+
     # Validate HTTP Request "Content-type"
     if (!preg_match('/application\/json/i',(request()->getHeader('Content-Type')[0] ?? ''))) {
       response()
@@ -119,15 +163,32 @@ class BlogCommentController extends \Nofuzz\Controller
       return null;
     }
 
-    $item = new \App\Db\BlogComment($body);
+    # Get original comment & verify it's our's
+    $item = (new \App\Db\BlogCommentDao())->fetchByKeywords(['uuid'=>$parUuid,'account_id'=>$this->account->getId()]);
+    if ( !$item ) {
+      response()
+        ->errorJson(400,'','Invalid {uuid}');
 
-    // Should check that all parameters/properties are correct in $item
+      return true;
+    }
 
-    $ok = (new \App\Db\BlogCommentDao('blog_db'))->update($item);
+    # Set properties & update
+    $item->setModifiedDt((new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    if (isset($body['comment'])) $item->setComment($body['comment']);
+    if (isset($body['status'])) $item->setStatus($body['status']);
+    $ok = (new \App\Db\BlogCommentDao())->update($item);
 
-    response()
-      ->setStatusCode( 200 )
-      ->setJsonBody( $item->asArray() );
+    if ($ok) {
+      response()
+        ->setCacheControl('private, no-cache, no-store')
+        ->setStatusCode( 200 )
+        ->setJsonBody( $item->asArray() );
+
+    } else {
+      response()
+        ->errorJson(500,'','Operation failed, reason unknown' );
+
+    }
 
     return true;
   }
@@ -139,12 +200,19 @@ class BlogCommentController extends \Nofuzz\Controller
    */
   public function handleDELETE(array $args)
   {
-    $parId = $args['id'] ?? null;   // Get path provided {id}
+    $parUuid = $args['uuid'];
 
-    $item = (new \App\Db\BlogCommentDao('blog_db'))->fetchById($parId);
-    if ($item) {
-      $ok = (new \App\Db\BlogCommentDao('blog_db'))->delete($item);
+    # Get Comment & verify it's our's
+    $item = (new \App\Db\BlogCommentDao())->fetchByKeywords(['uuid'=>$parUuid,'account_id'=>$this->account->getId()]);
+    if ( !$item ) {
+      response()
+        ->errorJson(400,'','Invalid {uuid}');
+
+      return true;
     }
+
+    # Delete comment
+    $ok = (new \App\Db\BlogCommentDao())->delete($item);
 
     response()
       ->setStatusCode( 204 )

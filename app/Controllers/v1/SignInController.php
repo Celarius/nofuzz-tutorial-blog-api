@@ -18,13 +18,6 @@ Content-Type: application/json
   "email": "adminn@domain.com",
   "password": "admin"
 }
-
-Successful Response:
-{
-  "result": "success",
-  "token": "...JWT token..."
-}
-
 */
 namespace App\Controllers\v1;
 
@@ -53,16 +46,16 @@ class SignInController extends \Nofuzz\Controller
     # Load the Account based on LOGIN_NAME or EMAIL
     if (!empty($params['login_name'])) {
       # Load the account specific by "login_name"
-      $account = (new \App\Db\BlogAccountDao('blog_db'))->fetchByLoginName($params['login_name']);
+      $account = (new \App\Db\BlogAccountDao())->fetchBy('login_name',$params['login_name']);
     } else
     if (!empty($params['email'])) {
       # Load the account specific by "email"
-      $account = (new \App\Db\BlogAccountDao('blog_db'))->fetchByEMail($params['email']);
+      $account = (new \App\Db\BlogAccountDao())->fetchBy('email',$params['email']);
     }
 
     if ($account) {
       # Verify password
-      $pwHash = \Nofuzz\Helpers\Hash::generate($account->getUuid().$params['password']);
+      $pwHash = \Nofuzz\Helpers\Hash::generate($account->getPwSalt().$params['password']);
 
       # Compare password hashes
       if ( strcmp($pwHash, $account->getPwHash())==0 ) {

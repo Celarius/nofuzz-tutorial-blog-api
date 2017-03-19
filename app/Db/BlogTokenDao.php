@@ -4,35 +4,32 @@
  *
  *    Dao class for table blog_tokens
  *
- *  Generated with DaoGen v0.4.3
+ *  Generated with DaoGen v0.4.8
  *
- * @since    2017-03-10 19:24:29
+ * @since    2017-03-18 21:42:54
  * @package  App\Db
  */
 #########################################################################################
 
-Use \App\Db\AbstractBaseDao as AbstractBaseDao;
-Use \App\Db\AbstractBaseEntity as AbstractBaseEntity;
+Use App\Db\AbstractBaseEntity as AbstractBaseEntity;
 
 namespace App\Db;
 
 /**
  * Dao class for rows in table "blog_tokens"
- *
- * @uses     \App\Db\AbstractBaseDao
- * @uses     \App\Db\AbstractBaseEntity
  */
-class BlogTokenDao extends AbstractBaseDao
+class BlogTokenDao extends \App\Db\AbstractBaseDao
 {
   /**
    * Constructor
    *
    * @param string  $connectionname    Database ConnectionName
    */
-  public function __construct(string $connectionName)
+  public function __construct(string $connectionName='')
   {
     parent::__construct($connectionName);
     $this->setTable('blog_tokens');
+    $this->setCacheTTL(60);
   }
 
   /**
@@ -43,7 +40,10 @@ class BlogTokenDao extends AbstractBaseDao
    */
   function makeEntity(array $fields=[]): AbstractBaseEntity
   {
-    return new \App\Db\BlogToken(array_change_key_case($fields),CASE_LOWER);
+    $item = new \App\Db\BlogToken(array_change_key_case($fields),CASE_LOWER);
+    $this->cacheSetItem($item);
+
+    return $item;
   }
 
   /**
@@ -53,44 +53,20 @@ class BlogTokenDao extends AbstractBaseDao
    */
   public function fetchAll(): array
   {
-    return
+    if ($items = $this->cacheGetAll()) return $items;
+
+    $items =
       $this->fetchCustom(
         'SELECT * FROM {table}'
       );
+
+    if ($items) $this->cacheSetAll($items);
+
+    return $items;
   }
 
   /**
-   * Fetch record by Id
-   *
-   * @param  int $id                    The id
-   * @return array|null
-   */
-  public function fetchById(int $id)
-  {
-    return
-      $this->fetchCustom(
-        'SELECT * FROM {table} WHERE id = :ID',
-        [':ID' => $id]
-      )[0] ?? null;
-  }
-
-  /**
-   * Fetch record by sessionid
-   *
-   * @param  string $sessionId          The sessionId
-   * @return array|null
-   */
-  public function fetchBySessionId(string $sessionId)
-  {
-    return
-      $this->fetchCustom(
-        'SELECT * FROM {table} WHERE sessionid = :SESSIONID',
-        [':SESSIONID' => $sessionId]
-      )[0] ?? null;
-  }
-
-  /**
-   * Fetch records by Keyword
+   * Fetch records by Keywords
    *
    * @param  array $keywords            Array with keyword = value
    * @return array
@@ -102,14 +78,39 @@ class BlogTokenDao extends AbstractBaseDao
     $limit = '';
     $binds = [];
 
-    if (!empty($keywords['id'])) {
-       $where .= 'AND (id = :ID) ';
-       $binds[':ID'] = $keywords['id'];
+    if (isset($keywords['id']) && strlen($keywords['id'])>0) {
+      $where .= 'AND (id = :ID) ';
+      $binds[':ID'] = $keywords['id'];
     }
 
-    if (!empty($keywords['sessionid'])) {
-       $where .= 'AND (sessionid = :SESSIONID) ';
-       $binds[':SESSIONID'] = $keywords['sessionid'];
+    if (isset($keywords['created_dt']) && strlen($keywords['created_dt'])>0) {
+      $where .= 'AND (created_dt = :CREATED_DT) ';
+      $binds[':CREATED_DT'] = $keywords['created_dt'];
+    }
+
+    if (isset($keywords['modified_dt']) && strlen($keywords['modified_dt'])>0) {
+      $where .= 'AND (modified_dt = :MODIFIED_DT) ';
+      $binds[':MODIFIED_DT'] = $keywords['modified_dt'];
+    }
+
+    if (isset($keywords['sessionid']) && strlen($keywords['sessionid'])>0) {
+      $where .= 'AND (sessionid LIKE :SESSIONID) ';
+      $binds[':SESSIONID'] = $keywords['sessionid'];
+    }
+
+    if (isset($keywords['account_id']) && strlen($keywords['account_id'])>0) {
+      $where .= 'AND (account_id = :ACCOUNT_ID) ';
+      $binds[':ACCOUNT_ID'] = $keywords['account_id'];
+    }
+
+    if (isset($keywords['expires_dt']) && strlen($keywords['expires_dt'])>0) {
+      $where .= 'AND (expires_dt = :EXPIRES_DT) ';
+      $binds[':EXPIRES_DT'] = $keywords['expires_dt'];
+    }
+
+    if (isset($keywords['status']) && strlen($keywords['status'])>0) {
+      $where .= 'AND (status = :STATUS) ';
+      $binds[':STATUS'] = $keywords['status'];
     }
 
     if (!empty($where))
@@ -137,10 +138,10 @@ class BlogTokenDao extends AbstractBaseDao
   /**
    * Insert $item into database
    *
-   * @param  \App\Db\AbstractBaseEntity $item      The item we are inserting
+   * @param  AbstractBaseEntity $item      The item we are inserting
    * @return bool
    */
-  public function insert(\App\Db\AbstractBaseEntity &$item): bool
+  public function insert(AbstractBaseEntity &$item): bool
   {
     $id =
       $this->execCustomGetLastId(
@@ -161,18 +162,20 @@ class BlogTokenDao extends AbstractBaseDao
 
     $item->setId($id);
 
+    $this->cacheSetItem($item);
+
     return ($id !=0);
   }
 
   /**
    * Update $item in database
    *
-   * @param  \App\Db\AbstractBaseEntity $item      The item we are updating
+   * @param  AbstractBaseEntity $item      The item we are updating
    * @return bool
    */
-  public function update(\App\Db\AbstractBaseEntity $item): bool
+  public function update(AbstractBaseEntity $item): bool
   {
-    return
+    $ok =
       $this->execCustom(
         'UPDATE {table} SET '.
         ' created_dt = :CREATED_DT, '.
@@ -193,6 +196,10 @@ class BlogTokenDao extends AbstractBaseDao
           ':ID' => $item->getId()
         ]
       );
+
+    if ($ok) $this->cacheSetItem($item);
+
+    return $ok;
   }
 
 } // EOC

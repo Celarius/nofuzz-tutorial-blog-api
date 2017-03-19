@@ -4,9 +4,9 @@
  *
  *    Controller for table blog_tokens
  *
- *  Generated with DaoGen v0.4.3
+ *  Generated with DaoGen v0.4.8
  *
- * @since    2017-03-10 19:24:29
+ * @since    2017-03-18 21:42:54
  * @package  Nofuzz Appliction
  */
 #########################################################################################
@@ -45,15 +45,17 @@ class BlogTokenController extends \Nofuzz\Controller
    */
   public function handleGET(array $args)
   {
-    $parId = $args['id'] ?? null;   // Get path provided {id}
+    $parUuid = $args['uuid']
 
-    if (!empty($parId)) {
-      $items = (new \App\Db\BlogTokenDao('blog_db'))->fetchById($parId);
+    if (!empty($parUuid)) {
+      $item = (new \App\Db\BlogTokenDao())->fetchBy('uuid',$parUuid);
+      if ($item) $items[] = $item;
     } else {
-      $items = (new \App\Db\BlogTokenDao('blog_db'))->fetchAll();
+      $items = (new \App\Db\BlogTokenDao())->fetchAll();
     }
 
-    $data = [];    foreach ($items as $item) $data[] = $item->asArray();
+    $data = [];    foreach ($items as $item)
+      $data[] = $item->asArray();
     response()
       ->setStatusCode( 200 )
       ->setJsonBody( $data );
@@ -83,11 +85,21 @@ class BlogTokenController extends \Nofuzz\Controller
       return null;
     }
 
-    $item = new \App\Db\BlogToken($body);
-
     // Should check for existance of $item already in DB and abort if found
+    // Ex. using:
+    //   $item = (new \App\Db\BlogTokenDao())->fetchBy('id',$id);
 
-    $ok = (new \App\Db\BlogTokenDao('blog_db'))->insert($item);
+    # Create new Item, set properties
+    $item = new \App\Db\BlogToken($body);
+    // $item->setId(0);
+    // $item->setCreatedDt((new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    // $item->setModifiedDt((new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    // $item->setSessionid('');
+    // $item->setAccountId(0);
+    // $item->setExpiresDt((new \DateTime("now",new \DateTimeZone("UTC")))->format("Y-m-d H:i:s"));
+    // $item->setStatus(0);
+
+    $ok = (new \App\Db\BlogTokenDao())->insert($item);
 
     response()
       ->setStatusCode( 200 )
@@ -122,7 +134,7 @@ class BlogTokenController extends \Nofuzz\Controller
 
     // Should check that all parameters/properties are correct in $item
 
-    $ok = (new \App\Db\BlogTokenDao('blog_db'))->update($item);
+    $ok = (new \App\Db\BlogTokenDao())->update($item);
 
     response()
       ->setStatusCode( 200 )
@@ -138,11 +150,13 @@ class BlogTokenController extends \Nofuzz\Controller
    */
   public function handleDELETE(array $args)
   {
-    $parId = $args['id'] ?? null;   // Get path provided {id}
+    $parUuid = $args['uuid'];
 
-    $item = (new \App\Db\BlogTokenDao('blog_db'))->fetchById($parId);
+    // Should check Authorization to perform delete of $item
+
+    $item = (new \App\Db\BlogTokenDao())->fetchBy('uuid',$parUuid);
     if ($item) {
-      $ok = (new \App\Db\BlogTokenDao('blog_db'))->delete($item);
+      $ok = (new \App\Db\BlogTokenDao())->delete($item);
     }
 
     response()
