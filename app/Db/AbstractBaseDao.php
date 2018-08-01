@@ -15,26 +15,64 @@ namespace App\Db;
  */
 interface AbstractBaseDaoInterface
 {
-  function makeEntity(array $fields=[]): AbstractBaseEntity;
+  function fetchBy(string $field, $value);
   function fetchCustom(string $sql,array $params=[]): array;
+  function fetchCount(string $field,array $params=[]): array;
+
   function execCustom(string $sql, array $params=[]): bool;
   function execCustomGetLastId(string $sql, array $params=[]): int;
+
   function insert(AbstractBaseEntity &$item): bool;
   function update(AbstractBaseEntity $item): bool;
   function delete(AbstractBaseEntity &$item): bool;
+
   function getTable(): string;
   function setTable(string $table);
   function getCacheTTL(): int;
-  function setCacheTTL(int $cacheTTL=0);
+  function setCacheTTL(int $cacheTTL=-1);
 }
 
 /**
  * AbstraceBaseDao Class
  */
-abstract class AbstractBaseDao extends \Nofuzz\Database\BaseDao implements AbstractBaseDaoInterface
+abstract class AbstractBaseDao extends \Nofuzz\Database\AbstractBaseDao implements AbstractBaseDaoInterface
 {
   protected $table;
-  protected $cacheTTL = 0;
+  protected $cacheTTL;
+
+  /**
+   * Constructor
+   *
+   * @param string  $connectionname    Database ConnectionName
+   */
+  public function __construct(string $connectionName='')
+  {
+    parent::__construct($connectionName);
+    $this->setTable('');
+    $this->setCacheTTL(-1);
+  }
+
+  /**
+   * Fetch a record by field
+   *
+   * @param  string $field      Field to match agains
+   * @param  mixed $value       Value to match with
+   * @return object | null
+   */
+  public function fetchBy(string $field, $value)
+  {
+    if ($item = $this->cacheGetItemByField($field,$value)) return $item;
+
+    $item =
+      $this->fetchCustom(
+        'SELECT * FROM {table} WHERE '.$field.' = :'.strtoupper($field),
+        [':'.strtoupper($field) => $value]
+      )[0] ?? null;
+
+    if ($item) $this->cacheSetItem($item,$field);
+
+    return $item;
+  }
 
   /**
    * Fetch all rows based on $sql and $prams
@@ -51,12 +89,12 @@ abstract class AbstractBaseDao extends \Nofuzz\Database\BaseDao implements Abstr
     # Default to no rows returned
     $rows = [];
     try {
-      $this->beginTransaction();
+      $autoCommit = $this->beginTransaction();
       # Prepare
       if ($sth=$this->db()->prepare($sql)) {
         # Binds
         foreach ($params as $bind=>$value) {
-          $sth->bindValue($bind, $value);
+          $sth->bindValue(':'.ltrim($bind,':'), $value);
         }
         # Exec
         if ($sth->execute()) {
@@ -67,7 +105,54 @@ abstract class AbstractBaseDao extends \Nofuzz\Database\BaseDao implements Abstr
         }
         $sth->closeCursor();
       }
-      $this->commit();
+      if ($autoCommit) $this->commit();
+
+    } catch (\Exception $e) {
+      logger()->critical($e->getMessage(),['rid'=>app('requestId'),'trace'=>$e->getTraceAsString()]);
+      $this->rollback();
+
+    }
+
+    return $rows;
+  }
+
+  /**
+   * Fetch Count based on params
+   *
+   * @param  string $field    Field to count
+   * @param  array  $params   [description]
+   * @return array
+   */
+  public function fetchCount(string $field,array $params=[]): array
+  {
+    $sql = 'SELECT COUNT('.$field.') AS count FROM '.$this->getTable();
+
+    if (count($params)>0) {
+      $sql .=' WHERE ';
+      foreach ($params as $param => $value) {
+        $sql .= $param.' = :'.strtoupper($param).' AND ';
+      }
+      $sql = substr($sql,0,-5); // rtrim has a bug with ' AND ' at the end!? Confirmed in PHP v7.1.1
+    }
+
+    # Default to no rows returned
+    $rows = [];
+    try {
+      $autoCommit = $this->beginTransaction();
+      # Prepare
+      if ($sth=$this->db()->prepare($sql)) {
+        # Binds
+        foreach ($params as $bind=>$value) {
+          $sth->bindValue(strtoupper(':'.$bind), $value);
+        }
+        # Exec
+        if ($sth->execute()) {
+          $rows = $sth->fetchAll(\PDO::FETCH_ASSOC);
+        }
+        $sth->closeCursor();
+      }
+      if ($autoCommit) $this->commit();
+
     } catch (\Exception $e) {
       logger()->critical($e->getMessage(),['rid'=>app('requestId'),'trace'=>$e->getTraceAsString()]);
       $this->rollback();
@@ -90,21 +175,24 @@ abstract class AbstractBaseDao extends \Nofuzz\Database\BaseDao implements Abstr
     # Default result
     $result = false;
     try {
-      $this->beginTransaction();
+      $autoCommit = $this->beginTransaction();
       if ($sth = $this->db()->prepare($sql))
       {
         # Binds
         foreach ($params as $bind=>$value) {
-          $sth->bindValue($bind, $value);
+          $sth->bindValue(':'.ltrim($bind,':'), $value);
         }
         # Execute
         $result = $sth->execute();
       }
-      $this->commit();
+      if ($autoCommit) $this->commit();
+
     } catch (\Exception $e) {
       logger()->critical($e->getMessage(),['rid'=>app('requestId'),'trace'=>$e->getTraceAsString()]);
       $this->rollback();
+
     }
+
     return $result;
   }
 
@@ -123,47 +211,27 @@ abstract class AbstractBaseDao extends \Nofuzz\Database\BaseDao implements Abstr
     # Default result
     $result = 0;
     try {
-      $this->beginTransaction();
+      $autoCommit = $this->beginTransaction();
       if ($sth = $this->db()->prepare($sql))
       {
         # Binds
         foreach ($params as $bind=>$value) {
-          $sth->bindValue($bind, $value);
+          $sth->bindValue(':'.ltrim($bind,':'), $value);
         }
         # Execute
         if ($sth->execute()) {
           $result = $this->db()->lastInsertId();
         }
       }
-      $this->commit();
+      if ($autoCommit) $this->commit();
+
     } catch (\Exception $e) {
       logger()->critical($e->getMessage(),['rid'=>app('requestId'),'trace'=>$e->getTraceAsString()]);
       $this->rollback();
 
     }
+
     return $result;
-  }
-
-  /**
-   * Fetch a record by field
-   *
-   * @param  string $field
-   * @param  mixed $value
-   * @return object | null
-   */
-  public function fetchBy(string $field, $value)
-  {
-    if ($item = $this->cacheGetItemByField($field)) return $item;
-
-    $item =
-      $this->fetchCustom(
-        'SELECT * FROM {table} WHERE '.$field.' = :'.strtoupper($field),
-        [':'.strtoupper($field) => $value]
-      )[0] ?? null;
-
-    if ($item) $this->cacheSetItem($item,$field);
-
-    return $item;
   }
 
   /**
@@ -192,16 +260,16 @@ abstract class AbstractBaseDao extends \Nofuzz\Database\BaseDao implements Abstr
   /**
    * Cache one $item
    *
-   * @param  class      $item         item to Set in cache
-   * @param  integer    $ttl          Optional. Override default TTL. Seconds
+   * @param  class      $item         Item to Set in cache
+   * @param  mixed      $ttl          Optional. Overrides default TTL. Seconds
    * @return bool
    */
-  protected function cacheSetItem(AbstractBaseEntity $item, $ttl=0 )
+  protected function cacheSetItem(AbstractBaseEntity $item, $ttl=null )
   {
-    if ($ttl==0)
+    if (is_null($ttl))
       $ttl = $this->getCacheTTL();
 
-    if ($ttl>0 && cache() && $item) {
+    if ($ttl>=0 && cache() && $item) {
       # Add Item to caches
       if (method_exists($item,'getId') && $item->getId()>0) cache()->set(static::class.':id:'.$item->getId(), $item, $ttl);
       if (method_exists($item,'getUuid') && !empty($item->getUuid())) cache()->set(static::class.':uuid:'.$item->getUuid(), $item, $ttl);
@@ -215,12 +283,13 @@ abstract class AbstractBaseDao extends \Nofuzz\Database\BaseDao implements Abstr
   /**
    * Get cached $item, based on field name
    *
-   * @param  string       $id         Item ID to look for
+   * @param  string       $field         field to search in
+   * @param  string       $value         value to search for
    * @return $item | false
    */
-  protected function cacheGetItemByField(string $field)
+  protected function cacheGetItemByField(string $field, string $value)
   {
-    $cacheKey = static::class.':'.$field.':'.$id;
+    $cacheKey = static::class.':'.$field.':'.$value;
     if (cache() && cache()->has($cacheKey)) {
       return cache()->get($cacheKey);
     }
@@ -281,13 +350,16 @@ abstract class AbstractBaseDao extends \Nofuzz\Database\BaseDao implements Abstr
   /**
    * Cache array of $item ($items)
    *
-   * @param  array       $items [description]
-   * @param  int|integer $ttl   [description]
+   * @param  array      $items        Items array to set in cache
+   * @param  mixed      $ttl          Optional. Overrides default TTL. Seconds
    * @return bool
    */
-  protected function cacheSetAll(array $items, int $ttl=60)
+  protected function cacheSetAll(array $items, $ttl=null)
   {
-    if (cache() && $items) {
+    if (is_null($ttl))
+      $ttl = $this->getCacheTTL();
+
+    if ($ttl>=0 && cache() && count($items)>0) {
       cache()->set(static::class.':all', $items, $ttl);
     }
 

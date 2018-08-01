@@ -8,6 +8,6 @@
 
 namespace App\Db;
 
-abstract class AbstractBaseEntity extends \Nofuzz\Database\BaseDbObject
+abstract class AbstractBaseEntity extends \Nofuzz\Database\AbstractBaseEntity
 {
 }

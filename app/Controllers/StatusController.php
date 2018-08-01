@@ -28,6 +28,9 @@ class StatusController extends \Nofuzz\Controller
       'timezone'=>date_default_timezone_get()
     ];
 
+    // $items = (new \App\Db\BlogArticleDao())->rawQuery('SELECT COUNT(ID) AS CNT FROM blog_blogs',[]);
+    // $data['x'] = $items; 
+
     response()
       ->setCacheControl('private, no-cache, no-store')
       ->setStatusCode( 200 )

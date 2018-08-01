@@ -51,6 +51,8 @@ class BlogAccountController extends \App\Controllers\v1\AbstractAuthController
     foreach ($items as $item)
       $data[] = $item->asArray();
 
+    $data['_count'] = (new \App\Db\BlogAccountDao())->fetchCount('id',['status'=>0,'pw_iterations'=>0]);
+
     response()
       ->setStatusCode( 200 )
       ->setJsonBody( $data );
